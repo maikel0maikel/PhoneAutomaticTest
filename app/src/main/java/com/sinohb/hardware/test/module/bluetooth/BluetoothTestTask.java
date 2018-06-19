@@ -18,9 +18,8 @@ public class BluetoothTestTask extends BaseTestTask {
     private static final int STEP_DISCOVERY_OK = 8;
     private static final int STEP_STOP_DISCOVERY = 9;
     private static final int STEP_STOP_DISCOVERY_OK = 10;
-    private static final int STEP_CONNECT_OPEN = 5;
-    private static final int STEP_CONNECT = 6;
-
+    private static final int STEP_RESET = 11;
+    private static final int STEP_RESET_FINISHED = 12;
 
     public BluetoothTestTask(BluetoothPresenter.Controller presenter) {
         super(presenter);
@@ -31,51 +30,93 @@ public class BluetoothTestTask extends BaseTestTask {
         boolean isPass = false;
         BluetoothPresenter.Controller controller = (BluetoothPresenter.Controller) mPresenter;
         LogTools.p(TAG, "蓝牙开始测试");
+        int bt = -10000;
         while (!isFinish) {
-            synchronized (mSync) {
-                if (mExecuteState == STATE_NONE) {//开始执行第一步打开蓝牙测试
+            switch (mExecuteState) {
+                case STATE_NONE:
                     mExecuteState = STATE_RUNNING;
-                    LogTools.p(TAG, "蓝牙测试打开");
+                    LogTools.p(TAG, "蓝牙任务测试开启");
                     mTestStep = STEP_OPEN;
-                    int bt = controller.openBt();
-                    if (deviceNotSupport(bt)) return false;
-                    stepWaite(STEP_OPEN);
-                    if (stepFailure(SETP_OPEN_FINISH, "蓝牙测试打开，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "蓝牙测试打开结束，测试结果【测试通过】");
-                    mTestStep = STEP_CLOSE;
-                    LogTools.p(TAG, "蓝牙测试关闭");
-                    bt = controller.closeBt();
-                    if (deviceNotSupport(bt)) return false;
-                    stepWaite(STEP_CLOSE);
-                    if (stepFailure(STEP_CLOSE_FINISH, "蓝牙测试关闭，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "蓝牙测试关闭结束，测试结果【测试通过】");
-                    mTestStep = STEP_REOPEN;
-                    LogTools.p(TAG, "重新打开蓝牙");
-                    bt = controller.openBt();
-                    if (deviceNotSupport(bt)) return false;
-                    stepWaite(STEP_REOPEN);
-                    if (stepFailure(STEP_REOPEN_FINISH, "蓝牙测试重新打开结束测试，测试结果【测试不通过】")) return false;
-                    mTestStep = STEP_DISCOVERY;
-                    bt = controller.startDiscovery();
-                    if (deviceNotSupport(bt)) return false;
-                    LogTools.p(TAG, "蓝牙测试扫描");
-                    stepWaite(STEP_DISCOVERY);
-                    if (stepFailure(STEP_DISCOVERY_OK, "蓝牙测试扫描，测试结果【测试不通过】")) return false;
-                    mTestStep = STEP_STOP_DISCOVERY;
-                    bt = controller.stopDisvcovery();
-                    if (deviceNotSupport(bt)) return false;
-                    LogTools.p(TAG, "蓝牙测试停止扫描");
-                    stepWaite(STEP_STOP_DISCOVERY);
-                    if (stepFailure(STEP_STOP_DISCOVERY_OK, "蓝牙测试停止扫描，测试结果【测试不通过】")) return false;
-
-                } else if (mExecuteState == STATE_PAUSE) {
-                    LogTools.i(TAG, "蓝牙测试任务暂停");
-                    try {
-                        mSync.wait();
-                    } catch (InterruptedException e) {
-                        LogTools.e(TAG, e);
+                    break;
+                case STATE_RUNNING:
+                    while (mExecuteState == STATE_RUNNING) {
+                        synchronized (mSync) {
+                            switch (mTestStep) {
+                                case STEP_OPEN:
+                                    LogTools.p(TAG, "蓝牙测试打开");
+                                    bt = controller.openBt();
+                                    if (bt == BluetoothConstants.DEVICE_RESET) {
+                                        LogTools.p(TAG,"蓝牙处于打开状态，关闭重置");
+                                        controller.closeBt();
+                                        mTestStep = STEP_RESET;
+                                        stepWaite(STEP_RESET);
+                                        break;
+                                    } else if (deviceNotSupport(bt)) return false;
+                                    stepWaite(STEP_OPEN);
+                                    if (stepFailure(SETP_OPEN_FINISH, "蓝牙测试打开，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "蓝牙测试打开结束，测试结果【测试通过】");
+                                    mTestStep = STEP_CLOSE;
+                                    break;
+                                case STEP_RESET_FINISHED:
+                                    mTestStep = STEP_OPEN;
+                                    LogTools.p(TAG,"重置成功");
+                                    break;
+                                case STEP_CLOSE:
+                                    LogTools.p(TAG, "蓝牙测试关闭");
+                                    bt = controller.closeBt();
+                                    if (deviceNotSupport(bt)) return false;
+                                    stepWaite(STEP_CLOSE);
+                                    if (stepFailure(STEP_CLOSE_FINISH, "蓝牙测试关闭，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "蓝牙测试关闭结束，测试结果【测试通过】");
+                                    mTestStep = STEP_REOPEN;
+                                    break;
+                                case STEP_REOPEN:
+                                    LogTools.p(TAG, "重新打开蓝牙");
+                                    bt = controller.openBt();
+                                    if (deviceNotSupport(bt)) return false;
+                                    stepWaite(STEP_REOPEN);
+                                    if (stepFailure(STEP_REOPEN_FINISH, "蓝牙测试重新打开结束测试，测试结果【测试不通过】"))
+                                        return false;
+                                    mTestStep = STEP_DISCOVERY;
+                                    break;
+                                case STEP_DISCOVERY:
+                                    bt = controller.startDiscovery();
+                                    if (deviceNotSupport(bt)) return false;
+                                    LogTools.p(TAG, "蓝牙测试扫描");
+                                    stepWaite(STEP_DISCOVERY);
+                                    if (stepFailure(STEP_DISCOVERY_OK, "蓝牙测试扫描，测试结果【测试不通过】"))
+                                        return false;
+                                    mTestStep = STEP_STOP_DISCOVERY;
+                                    break;
+                                case STEP_STOP_DISCOVERY:
+                                    bt = controller.stopDisvcovery();
+                                    if (deviceNotSupport(bt)) return false;
+                                    LogTools.p(TAG, "蓝牙测试停止扫描");
+                                    stepWaite(STEP_STOP_DISCOVERY);
+                                    if (stepFailure(STEP_STOP_DISCOVERY_OK, "蓝牙测试停止扫描，测试结果【测试不通过】"))
+                                        return false;
+                                    mExecuteState = STATE_FINISH;
+                                    break;
+                            }
+                        }
                     }
-                }
+                    break;
+                case STATE_PAUSE:
+                    synchronized (mSync) {
+                        LogTools.p(TAG, "蓝牙测试任务暂停");
+                        try {
+                            mSync.wait();
+                        } catch (InterruptedException e) {
+                            LogTools.e(TAG, e);
+                        }
+                    }
+                    break;
+                case STATE_FINISH:
+                    controller.complete();
+                    isFinish = true;
+                    break;
             }
         }
         return isPass;
@@ -124,6 +165,9 @@ public class BluetoothTestTask extends BaseTestTask {
                 case BluetoothConstants.OpenState.STATE_TURNED_OFF:
                     if (mTestStep == STEP_CLOSE) {
                         mTestStep = STEP_CLOSE_FINISH;
+                        mSync.notify();
+                    } else if (mTestStep == STEP_RESET) {
+                        mTestStep = STEP_RESET_FINISHED;
                         mSync.notify();
                     }
                     break;

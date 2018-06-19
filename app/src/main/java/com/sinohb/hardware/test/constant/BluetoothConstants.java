@@ -4,6 +4,7 @@ public class BluetoothConstants {
     private BluetoothConstants(){}
     public static final int DEVICE_NOT_SUPPORT = -1;
     public static final int DEVICE_SUPPORT = 0;
+    public static final int DEVICE_RESET = 10000;
     public static class OpenState{
         public static final int STATE_TURNING_ON = 1;
         public static final int STATE_TURNED_ON = 2;

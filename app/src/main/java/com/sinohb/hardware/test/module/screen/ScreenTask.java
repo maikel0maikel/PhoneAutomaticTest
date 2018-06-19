@@ -25,7 +25,7 @@ public class ScreenTask extends BaseTestTask {
                 case STATE_NONE:
                     mExecuteState = STATE_RUNNING;
                     mTestStep = STEP_R;
-                    testing(controller);
+                    //testing(controller);
                     break;
                 case STATE_RUNNING:
                     testing(controller);

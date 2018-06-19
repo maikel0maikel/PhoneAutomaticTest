@@ -17,10 +17,6 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
     private ScreenAdjustPresenter.View mView;
     private Calibration cal;
     static final int SAMPLE_COUNTS = 5;
-    static final int POINT_DEGREE = 2;
-    static final int FACTOR_COUNTS = 7;
-    static final int X_AXIS = 0;
-    static final int Y_AXIS = 1;
     static final int EDGE_GAP = 50;
     private int X_RES;
     private int Y_RES;

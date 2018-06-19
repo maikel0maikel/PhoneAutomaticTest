@@ -28,10 +28,6 @@ public class ScreenAdjustView extends Activity implements ScreenAdjustPresenter.
     }
 
 
-    public ScreenAdjustPresenter.Controller getPresenter() {
-        return mPresenter;
-    }
-
     @Override
     public void setPresenter(ScreenAdjustPresenter.Controller presenter) {
         mPresenter = presenter;

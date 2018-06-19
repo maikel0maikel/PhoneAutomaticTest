@@ -45,76 +45,112 @@ public class WifiTestTask extends BaseTestTask {
     @Override
     public Boolean call() {
         boolean isPass = true;
+        int result = -10000;
         WifiPresenter.Controller controller = (WifiPresenter.Controller) mPresenter;
-        LogTools.p(TAG, "Wifi开始测试");
         while (!isFinish) {
-            synchronized (mSync) {
-                if (mExecuteState == STATE_NONE) {//开始执行第一步打开Wifi测试
+            switch (mExecuteState) {
+                case STATE_NONE:
                     mExecuteState = STATE_RUNNING;
-                    LogTools.p(TAG, "Wifi测试打开");
+                    LogTools.p(TAG, "Wifi开始测试");
                     mTestStep = STEP_OPEN;
-                    int result = controller.openWifi();
-                    if (result == WifiConstants.DEVICE_RESET) {
-                        controller.closeWifi();
-                        mTestStep = STEP_RESET;
-                        stepWaite(STEP_RESET);
-                    }else if (deviceNotSupport(result)) return false;
-                    mTestStep = STEP_OPEN;
-                    result = controller.openWifi();
-                    if (deviceNotSupport(result)) return false;
-                    stepWaite(STEP_OPEN);
-                    if (stepFailure(SETP_OPEN_FINISH, "Wifi测试打开，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "Wifi测试打开结束，测试结果【测试通过】");
-                    mTestStep = STEP_CLOSE;
-                    LogTools.p(TAG, "Wifi测试关闭");
-                    result = controller.closeWifi();
-                    if (deviceNotSupport(result)) return false;
-                    stepWaite(STEP_CLOSE);
-                    if (stepFailure(STEP_CLOSE_FINISH, "Wifi测试关闭，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "Wifi测试关闭结束，测试结果【测试通过】");
-                    mTestStep = STEP_REOPEN;
-                    LogTools.p(TAG, "重新打开Wifi");
-                    result = controller.openWifi();
-                    if (deviceNotSupport(result)) return false;
-                    stepWaite(STEP_REOPEN);
-                    if (stepFailure(STEP_REOPEN_FINISH, "Wifi测试重新打开结束测试，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "重新打开Wifi结束");
-                    mTestStep = STEP_DISCOVERY;
-                    result = controller.startScan();
-                    if (deviceNotSupport(result)) return false;
-                    LogTools.p(TAG, "Wifi测试扫描");
-                    stepWaite(STEP_DISCOVERY);
-                    if (stepFailure(STEP_DISCOVERY_OK, "Wifi测试扫描，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "Wifi测试扫描通过");
-                    mTestStep = STEP_CONNECT;
-                    LogTools.p(TAG, "Wifi测试连接");
-                    result = controller.connectWifi();
-                    if (result == WifiConstants.DEVICE_CONNECTED) {
-                        LogTools.p(TAG, "Wifi已经连接");
-                    } else if (deviceNotSupport(result)) return false;
-                    stepWaite(STEP_CONNECT);
-                    if (stepFailure(STEP_CONNECT_OK, "Wifi测试连接，测试结果【测试不通过】")) return false;
-                    LogTools.p(TAG, "Wifi测试连接通过");
-                    LogTools.p(TAG, "开始请求百度...");
-                    int code = 0;
-                    try {
-                        code = getHttpCode("https://www.baidu.com/");
-                    } catch (IOException e) {
-                        LogTools.e(TAG, e, "请求失败");
+                    break;
+                case STATE_RUNNING:
+                    while (mExecuteState == STATE_RUNNING) {
+                        synchronized (mSync) {
+                            switch (mTestStep) {
+                                case STEP_OPEN:
+                                    LogTools.p(TAG, "Wifi测试打开");
+                                    result = controller.openWifi();
+                                    if (result == WifiConstants.DEVICE_RESET) {
+                                        LogTools.p(TAG, "WiFi处于打开状态，关闭重置");
+                                        controller.closeWifi();
+                                        mTestStep = STEP_RESET;
+                                        stepWaite(STEP_RESET);
+                                        break;
+                                    } else if (deviceNotSupport(result)) return false;
+                                    stepWaite(STEP_OPEN);
+                                    if (stepFailure(SETP_OPEN_FINISH, "Wifi测试打开，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "Wifi测试打开结束，测试结果【测试通过】");
+                                    mTestStep = STEP_CLOSE;
+                                    break;
+                                case STEP_RESET_FINISHED:
+                                    mTestStep = STEP_OPEN;
+                                    LogTools.p(TAG,"重置成功");
+                                    break;
+                                case STEP_CLOSE:
+                                    LogTools.p(TAG, "Wifi测试关闭");
+                                    result = controller.closeWifi();
+                                    if (deviceNotSupport(result)) return false;
+                                    stepWaite(STEP_CLOSE);
+                                    if (stepFailure(STEP_CLOSE_FINISH, "Wifi测试关闭，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "Wifi测试关闭结束，测试结果【测试通过】");
+                                    mTestStep = STEP_REOPEN;
+                                    break;
+                                case STEP_REOPEN:
+                                    LogTools.p(TAG, "重新打开Wifi");
+                                    result = controller.openWifi();
+                                    if (deviceNotSupport(result)) return false;
+                                    stepWaite(STEP_REOPEN);
+                                    if (stepFailure(STEP_REOPEN_FINISH, "Wifi测试重新打开结束测试，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "重新打开Wifi结束");
+                                    mTestStep = STEP_DISCOVERY;
+                                    break;
+                                case STEP_DISCOVERY:
+                                    LogTools.p(TAG, "Wifi测试扫描");
+                                    result = controller.startScan();
+                                    if (deviceNotSupport(result)) return false;
+                                    stepWaite(STEP_DISCOVERY);
+                                    if (stepFailure(STEP_DISCOVERY_OK, "Wifi测试扫描，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "Wifi测试扫描通过");
+                                    mTestStep = STEP_CONNECT;
+                                    break;
+                                case STEP_CONNECT:
+                                    LogTools.p(TAG, "Wifi测试连接");
+                                    result = controller.connectWifi();
+                                    if (result == WifiConstants.DEVICE_CONNECTED) {
+                                        LogTools.p(TAG, "Wifi已经连接");
+                                    } else if (deviceNotSupport(result)) return false;
+                                    stepWaite(STEP_CONNECT);
+                                    if (stepFailure(STEP_CONNECT_OK, "Wifi测试连接，测试结果【测试不通过】"))
+                                        return false;
+                                    LogTools.p(TAG, "Wifi测试连接通过");
+                                    LogTools.p(TAG, "开始请求百度...");
+                                    int code = 0;
+                                    try {
+                                        code = getHttpCode("https://www.baidu.com/");
+                                    } catch (IOException e) {
+                                        LogTools.e(TAG, e, "请求失败");
+                                    }
+                                    if (code != 200) {
+                                        LogTools.p(TAG, "请求百度失败，网络不可用，测试结果【测试不通过】");
+                                        return false;
+                                    }
+                                    LogTools.p(TAG, "Wifi所有项目测试完毕，测试结果【测试通过】");
+                                    mExecuteState = STATE_FINISH;
+                                    break;
+                            }
+                        }
                     }
-                    if (code != 200) {
-                        LogTools.p(TAG, "请求百度失败，网络不可用，测试结果【测试不通过】");
-                        return false;
+                    break;
+                case STATE_PAUSE:
+                    synchronized (mSync) {
+                        LogTools.i(TAG, "Wifi测试任务暂停");
+                        try {
+                            mSync.wait();
+                        } catch (InterruptedException e) {
+                            LogTools.e(TAG, e);
+                        }
                     }
-                    LogTools.p(TAG, "Wifi所有项目测试完毕，测试结果【测试通过】");
-                } else if (mExecuteState == STATE_PAUSE) {
-                    LogTools.i(TAG, "Wifi测试任务暂停");
-                    try {
-                        mSync.wait();
-                    } catch (InterruptedException e) {
-                        LogTools.e(TAG, e);
-                    }
-                }
+                    break;
+                case STATE_FINISH:
+                    controller.complete();
+                    LogTools.p(TAG, "wifi 测试任务完成");
+                    isFinish = true;
+                    break;
             }
         }
         return isPass;
@@ -196,8 +232,6 @@ public class WifiTestTask extends BaseTestTask {
     }
 
 
-
-
     private int getHttpCode(String requestUrl) throws IOException {
         int responseCode = 0;
         URL url = new URL(requestUrl);
@@ -239,7 +273,7 @@ public class WifiTestTask extends BaseTestTask {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            LogTools.e(TAG,e,"trustAllHosts error");
+            LogTools.e(TAG, e, "trustAllHosts error");
         }
     }
 

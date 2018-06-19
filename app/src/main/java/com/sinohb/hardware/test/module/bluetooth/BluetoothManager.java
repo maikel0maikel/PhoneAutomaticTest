@@ -29,7 +29,8 @@ public class BluetoothManager implements BluetoothManagerable {
         if (!mDeviceBluetoothManager.isEnabled()) {
             mDeviceBluetoothManager.enable();
         } else {
-            BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_ON);
+           // BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_ON);
+            return BluetoothConstants.DEVICE_RESET;
         }
         return  BluetoothConstants.DEVICE_SUPPORT;
     }
@@ -43,7 +44,8 @@ public class BluetoothManager implements BluetoothManagerable {
         if (mDeviceBluetoothManager.isEnabled()) {
             mDeviceBluetoothManager.disable();
         } else {
-            BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
+            //BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
+            return BluetoothConstants.DEVICE_RESET;
         }
         return  BluetoothConstants.DEVICE_SUPPORT;
     }

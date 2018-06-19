@@ -19,8 +19,8 @@ public class ScreenAdjustTask extends BaseTestTask {
     @Override
     public Boolean call() throws Exception {
         ScreenAdjustPresenter.Controller controller = (ScreenAdjustPresenter.Controller) mPresenter;
+        LogTools.p(TAG, "屏幕校准开始");
         while (!isFinish) {
-            LogTools.p(TAG, "屏幕校准开始");
             switch (mExecuteState) {
                 case STATE_NONE:
                     mExecuteState = STATE_RUNNING;

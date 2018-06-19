@@ -12,21 +12,23 @@ import com.sinohb.hardware.test.task.ThreadPool;
 
 import java.util.concurrent.FutureTask;
 
-public class BluetoothController implements BluetoothPresenter.Controller,BluetoothObserver{
+public class BluetoothController implements BluetoothPresenter.Controller, BluetoothObserver {
 
     private BluetoothEventReceiver bluetoothReceiver;
     private BluetoothPresenter.View mView;
     private BluetoothManagerable mBluetoothManager;
     private BluetoothTestTask mTask;
-    public BluetoothController(BluetoothPresenter.View view){
+
+    public BluetoothController(BluetoothPresenter.View view) {
         this.mView = view;
         this.mView.setPresenter(this);
         mBluetoothManager = new BluetoothManager();
         BluetoothSubjectManager.getInstance().attchBluetoothObserver(this);
     }
+
     @Override
     public int openBt() {
-       return mBluetoothManager.open();
+        return mBluetoothManager.open();
 
     }
 
@@ -96,11 +98,12 @@ public class BluetoothController implements BluetoothPresenter.Controller,Blueto
     @Override
     public void destroy() {
         unregistBluetoothReceiver();
-        if (mTask!=null){
+        if (mTask != null) {
             mTask.stopTask();
         }
         ThreadPool.getPool().destroy();
     }
+
     private void registBluetoothReceiver() {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -114,8 +117,9 @@ public class BluetoothController implements BluetoothPresenter.Controller,Blueto
         bluetoothReceiver = new BluetoothEventReceiver();
         HardwareTestApplication.getContext().registerReceiver(bluetoothReceiver, intentFilter);
     }
-    private void unregistBluetoothReceiver(){
-        if (bluetoothReceiver!=null){
+
+    private void unregistBluetoothReceiver() {
+        if (bluetoothReceiver != null) {
             HardwareTestApplication.getContext().unregisterReceiver(bluetoothReceiver);
             bluetoothReceiver = null;
         }
@@ -124,7 +128,7 @@ public class BluetoothController implements BluetoothPresenter.Controller,Blueto
     @Override
     public void notifyOpenState(int openedState) {
         mView.notifyOpenOrCloseState(openedState);
-        if (mTask!=null) {
+        if (mTask != null) {
             mTask.notifyBtOpenState(openedState);
         }
     }
@@ -146,11 +150,15 @@ public class BluetoothController implements BluetoothPresenter.Controller,Blueto
 
     @Override
     public void notifyScanStarted() {
-
+        if (mTask != null) {
+            mTask.notifyBtStartDiscovery();
+        }
     }
 
     @Override
     public void notifyScanFinished() {
-
+        if (mTask != null) {
+            mTask.notifyBtStopDiscovery();
+        }
     }
 }
