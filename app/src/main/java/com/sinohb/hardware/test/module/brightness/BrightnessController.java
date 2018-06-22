@@ -30,7 +30,7 @@ public class BrightnessController implements BrightnessPresenter.Controller {
      * @param resolver
      * @param brightness
      */
-    public static void setBrightness(ContentResolver resolver, int brightness) {
+    private void setBrightness(ContentResolver resolver, int brightness) {
         Uri uri = android.provider.Settings.System
                 .getUriFor("screen_brightness");
 

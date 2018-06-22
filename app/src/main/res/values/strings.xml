@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">HardwareTest</string>
+    <string name="label_main_bar_title">automated test</string>
+    <string name="label_bluetooth">Bluetooth</string>
+    <string name="label_wifi">WIFI</string>
+    <string name="label_screen_calibration">Screen calibration</string>
+    <string name="lable_screen_rgb">Screen</string>
+    <string name="lable_screen_brightness">Brightness</string>
+    <string name="lable_radio">Radio</string>
+    <string name="lable_sound_effects">Effects</string>
+    <string name="lable_amplifier">amplifier</string>
+    <string name="label_gps">GPS</string>
+    <string name="label_usb">USB</string>
+    <string name="lable_tf">TF</string>
+    <string name="lable_key">Physical Key</string>
+    <string name="lable_knob">Knob</string>
+    <string name="lable_serial">Serial</string>
+    <string name="lable_aux">AUX</string>
+    <string name="lable_video_surveillance">video surveillance</string>
+    <string name="lable_rear_view">rear view</string>
+    <string name="lable_fan">fan</string>
+    <string name="lable_temperature">temperature</string>
+
 </resources>

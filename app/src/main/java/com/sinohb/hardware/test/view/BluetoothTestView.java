@@ -7,8 +7,6 @@ import android.support.annotation.Nullable;
 import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.module.bluetooth.BluetoothController;
 import com.sinohb.hardware.test.module.bluetooth.BluetoothPresenter;
-import com.sinohb.hardware.test.module.wifi.WifiController;
-import com.sinohb.hardware.test.module.wifi.WifiPresenter;
 
 public class BluetoothTestView extends Activity implements BluetoothPresenter.View{
     private BluetoothPresenter.Controller mPresenter;

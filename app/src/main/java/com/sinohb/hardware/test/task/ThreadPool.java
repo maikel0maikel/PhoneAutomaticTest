@@ -1,14 +1,31 @@
 package com.sinohb.hardware.test.task;
 
+import android.support.annotation.NonNull;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ThreadPool {
     private List<Runnable> mTaskQueue = new LinkedList<>();
-    Worker worker;
+    private Worker worker;
     private static ThreadPool mPool;
+    private static ThreadFactory TF = new ThreadFactory() {
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+
+        @Override
+        public Thread newThread(@NonNull Runnable r) {
+            return new Thread(r, "task#" + atomicInteger.getAndIncrement());
+        }
+    };
+    private static ThreadPoolExecutor EXECUTOR = null;
 
     private ThreadPool() {
+        EXECUTOR = new ThreadPoolExecutor(0, 5, 0l, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), TF);
         worker = new Worker();
         worker.start();
     }
@@ -24,15 +41,18 @@ public final class ThreadPool {
         return mPool;
     }
 
-
     public void execute(Runnable task) {
+        EXECUTOR.execute(task);
+    }
+
+    public void executeOrderTask(Runnable task) {
         synchronized (mTaskQueue) {
             mTaskQueue.add(task);
             mTaskQueue.notifyAll();
         }
     }
 
-    public void execute(Runnable[] tasks) {
+    public void executeOrderTask(Runnable[] tasks) {
         synchronized (mTaskQueue) {
             for (Runnable r : tasks) {
                 mTaskQueue.add(r);
@@ -41,7 +61,7 @@ public final class ThreadPool {
         }
     }
 
-    public void execute(List<Runnable> tasks) {
+    public void executeOrderTask(List<Runnable> tasks) {
         synchronized (mTaskQueue) {
             for (Runnable r : tasks) {
                 mTaskQueue.add(r);
@@ -50,13 +70,22 @@ public final class ThreadPool {
         }
     }
 
-    public void destroy(){
-        if (worker!=null){
+    public void destroy() {
+        while (!mTaskQueue.isEmpty()){
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (worker != null) {
             worker.stopWork();
             worker = null;
         }
         mTaskQueue.clear();
+        EXECUTOR.shutdownNow();
         mPool = null;
+        EXECUTOR = null;
     }
 
     class Worker extends Thread {

@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">HardwareTest</string>
+    <string name="label_main_bar_title">自动化测试</string>
+    <string name="label_bluetooth">蓝牙</string>
+    <string name="label_wifi">WIFI</string>
+    <string name="label_screen_calibration">屏幕校准</string>
+    <string name="lable_screen_rgb">显示屏</string>
+    <string name="lable_screen_brightness">亮度</string>
+    <string name="lable_radio">收音机</string>
+    <string name="lable_sound_effects">音效</string>
+    <string name="lable_amplifier">功放</string>
+    <string name="label_gps">GPS</string>
+    <string name="label_usb">USB</string>
+    <string name="lable_tf">TF卡</string>
+    <string name="lable_key">按键</string>
+    <string name="lable_knob">旋钮</string>
+    <string name="lable_serial">串口服务</string>
+    <string name="lable_aux">AUX</string>
+    <string name="lable_video_surveillance">视频监控</string>
+    <string name="lable_rear_view">倒车后视</string>
+    <string name="lable_fan">风扇</string>
+    <string name="lable_temperature">温度检测</string>
+</resources>

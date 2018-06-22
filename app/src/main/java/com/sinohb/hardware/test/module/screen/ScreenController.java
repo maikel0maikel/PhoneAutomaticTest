@@ -3,6 +3,7 @@ package com.sinohb.hardware.test.module.screen;
 import android.os.Handler;
 import android.os.Message;
 
+import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.task.ThreadPool;
 
 import java.lang.ref.WeakReference;
@@ -21,17 +22,17 @@ public class ScreenController implements ScreenPresenter.Controller{
 
     @Override
     public void displayR() {
-        mHandler.sendEmptyMessage(ScreenHandler.MSG_RED);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_RED);
     }
 
     @Override
     public void displayG() {
-        mHandler.sendEmptyMessage(ScreenHandler.MSG_GREEN);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_GREEN);
     }
 
     @Override
     public void displayB() {
-        mHandler.sendEmptyMessage(ScreenHandler.MSG_BLUE);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_BLUE);
     }
 
     @Override
@@ -62,9 +63,7 @@ public class ScreenController implements ScreenPresenter.Controller{
     }
 
     static class ScreenHandler extends Handler{
-        static final int MSG_RED = 1;
-        static final int MSG_GREEN = 2;
-        static final int MSG_BLUE = 3;
+
         private WeakReference<ScreenController> controllerWeakReference = null;
         ScreenHandler(ScreenController controller){
             controllerWeakReference = new WeakReference<>(controller);
@@ -80,13 +79,13 @@ public class ScreenController implements ScreenPresenter.Controller{
                 return;
             }
             switch (msg.what){
-                case MSG_RED:
+                case Constants.HandlerMsg.MSG_RED:
                     controller.mView.displayR();
                     break;
-                case MSG_GREEN:
+                case Constants.HandlerMsg.MSG_GREEN:
                     controller.mView.displayG();
                     break;
-                case MSG_BLUE:
+                case Constants.HandlerMsg.MSG_BLUE:
                     controller.mView.displayB();
                     break;
             }

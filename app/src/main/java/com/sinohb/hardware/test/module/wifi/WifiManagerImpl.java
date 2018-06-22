@@ -80,8 +80,8 @@ public class WifiManagerImpl implements WifiManagerable {
                 return realConnectSSID(result.SSID);
             }
         }
-        LogTools.p(TAG, "未找到SSID");
-        return WifiConstants.WifiConfigurate.SSID_NOT_FOUND;
+        LogTools.p(TAG, "未找到SSID直接去连接");
+       return realConnectSSID(WifiConstants.WifiConfigurate.SSID);
     }
 
     private int realConnectSSID(String ssid) {

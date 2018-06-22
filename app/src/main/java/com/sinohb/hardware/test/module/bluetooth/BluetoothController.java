@@ -22,7 +22,7 @@ public class BluetoothController implements BluetoothPresenter.Controller, Bluet
     public BluetoothController(BluetoothPresenter.View view) {
         this.mView = view;
         this.mView.setPresenter(this);
-        mBluetoothManager = new BluetoothManager();
+        mBluetoothManager = new BLEManager();
         BluetoothSubjectManager.getInstance().attchBluetoothObserver(this);
     }
 

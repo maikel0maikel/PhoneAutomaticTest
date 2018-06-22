@@ -72,7 +72,8 @@ public class WifiTestTask extends BaseTestTask {
                                     if (stepFailure(SETP_OPEN_FINISH, "Wifi测试打开，测试结果【测试不通过】"))
                                         return false;
                                     LogTools.p(TAG, "Wifi测试打开结束，测试结果【测试通过】");
-                                    mTestStep = STEP_CLOSE;
+                                    //mTestStep = STEP_CLOSE;
+                                    mTestStep = STEP_DISCOVERY;//步骤调整
                                     break;
                                 case STEP_RESET_FINISHED:
                                     mTestStep = STEP_OPEN;
@@ -86,7 +87,8 @@ public class WifiTestTask extends BaseTestTask {
                                     if (stepFailure(STEP_CLOSE_FINISH, "Wifi测试关闭，测试结果【测试不通过】"))
                                         return false;
                                     LogTools.p(TAG, "Wifi测试关闭结束，测试结果【测试通过】");
-                                    mTestStep = STEP_REOPEN;
+                                    //mTestStep = STEP_REOPEN;
+                                    mExecuteState = STATE_FINISH;//步骤调整
                                     break;
                                 case STEP_REOPEN:
                                     LogTools.p(TAG, "重新打开Wifi");
@@ -105,7 +107,12 @@ public class WifiTestTask extends BaseTestTask {
                                     stepWaite(STEP_DISCOVERY);
                                     if (stepFailure(STEP_DISCOVERY_OK, "Wifi测试扫描，测试结果【测试不通过】"))
                                         return false;
-                                    LogTools.p(TAG, "Wifi测试扫描通过");
+                                    LogTools.p(TAG, "Wifi测试扫描通过，并睡眠2s");
+                                    try {
+                                        Thread.sleep(2000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
                                     mTestStep = STEP_CONNECT;
                                     break;
                                 case STEP_CONNECT:
@@ -129,8 +136,9 @@ public class WifiTestTask extends BaseTestTask {
                                         LogTools.p(TAG, "请求百度失败，网络不可用，测试结果【测试不通过】");
                                         return false;
                                     }
-                                    LogTools.p(TAG, "Wifi所有项目测试完毕，测试结果【测试通过】");
-                                    mExecuteState = STATE_FINISH;
+                                    LogTools.p(TAG,"请求百度成功");
+                                    //mExecuteState = STATE_FINISH;
+                                    mTestStep = STEP_CLOSE;//步骤调整
                                     break;
                             }
                         }
@@ -148,11 +156,12 @@ public class WifiTestTask extends BaseTestTask {
                     break;
                 case STATE_FINISH:
                     controller.complete();
-                    LogTools.p(TAG, "wifi 测试任务完成");
+                    LogTools.p(TAG, "Wifi所有项目测试完毕，测试结果【测试通过】");
                     isFinish = true;
                     break;
             }
         }
+        LogTools.p(TAG, "wifi 测试任务结束");
         return isPass;
     }
 

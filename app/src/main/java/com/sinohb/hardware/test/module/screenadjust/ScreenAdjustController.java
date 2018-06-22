@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
+import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.entities.Calibration;
 import com.sinohb.hardware.test.task.ThreadPool;
 import com.sinohb.logger.LogTools;
@@ -54,31 +55,31 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
 
     @Override
     public void adjustLeftTop() {
-        mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_LEFT_TOP);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_LEFT_TOP);
         mJustDirection = LEFT_TOP;
     }
 
     @Override
     public void adjustRightTop() {
-        mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_RIGHT_TOP);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_RIGHT_TOP);
         mJustDirection = RIGHT_TOP;
     }
 
     @Override
     public void adjustLeftBottom() {
-        mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_LEFT_BOTTOM);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_LEFT_BOTTOM);
         mJustDirection = LEFT_BOTTOM;
     }
 
     @Override
     public void adjustRightBottom() {
-        mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_RIGHT_BOTTOM);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_RIGHT_BOTTOM);
         mJustDirection = RIGHT_BOTTOM;
     }
 
     @Override
     public void adjustCenter() {
-        mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_CENTER);
+        mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_CENTER);
         mJustDirection = CENTER;
     }
 
@@ -122,7 +123,7 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
         boolean ret = performCalibration();
         if (ret) {
             saveCalibrationResult();
-            mHandler.sendEmptyMessage(AdjustHandler.MSG_ADJUST_COMPLETE);
+            mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_ADJUST_COMPLETE);
         } else {
             mJustDirection = LEFT_TOP;
             LogTools.e(TAG, "Calibration failed");
@@ -216,12 +217,7 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
 
     private static class AdjustHandler extends Handler {
         private WeakReference<ScreenAdjustController> controllerWeakReference = null;
-        static final int MSG_ADJUST_LEFT_TOP = 111;
-        static final int MSG_ADJUST_RIGHT_TOP = 112;
-        static final int MSG_ADJUST_LEFT_BOTTOM = 113;
-        static final int MSG_ADJUST_RIGHT_BOTTOM = 114;
-        static final int MSG_ADJUST_CENTER = 115;
-        static final int MSG_ADJUST_COMPLETE = 116;
+
 
         AdjustHandler(ScreenAdjustController controller) {
             controllerWeakReference = new WeakReference<>(controller);
@@ -240,22 +236,22 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
                 return;
             }
             switch (msg.what) {
-                case MSG_ADJUST_LEFT_TOP:
+                case Constants.HandlerMsg.MSG_ADJUST_LEFT_TOP:
                     controller.mView.displayAdjustView(LEFT_TOP, controller.cal);
                     break;
-                case MSG_ADJUST_RIGHT_TOP:
+                case Constants.HandlerMsg.MSG_ADJUST_RIGHT_TOP:
                     controller.mView.displayAdjustView(RIGHT_TOP, controller.cal);
                     break;
-                case MSG_ADJUST_LEFT_BOTTOM:
+                case Constants.HandlerMsg.MSG_ADJUST_LEFT_BOTTOM:
                     controller.mView.displayAdjustView(LEFT_BOTTOM, controller.cal);
                     break;
-                case MSG_ADJUST_RIGHT_BOTTOM:
+                case Constants.HandlerMsg.MSG_ADJUST_RIGHT_BOTTOM:
                     controller.mView.displayAdjustView(RIGHT_BOTTOM, controller.cal);
                     break;
-                case MSG_ADJUST_CENTER:
+                case Constants.HandlerMsg.MSG_ADJUST_CENTER:
                     controller.mView.displayAdjustView(CENTER, controller.cal);
                     break;
-                case MSG_ADJUST_COMPLETE:
+                case Constants.HandlerMsg.MSG_ADJUST_COMPLETE:
                     controller.mView.complete();
                     break;
             }

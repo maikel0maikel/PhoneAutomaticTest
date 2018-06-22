@@ -20,7 +20,8 @@ public class BluetoothTestTask extends BaseTestTask {
     private static final int STEP_STOP_DISCOVERY_OK = 10;
     private static final int STEP_RESET = 11;
     private static final int STEP_RESET_FINISHED = 12;
-
+    private static final int SETP_OPEN_FAILURE = 14;
+    private static final int STEP_CLOSE_FAILURE = 15;
     public BluetoothTestTask(BluetoothPresenter.Controller presenter) {
         super(presenter);
     }
@@ -80,6 +81,7 @@ public class BluetoothTestTask extends BaseTestTask {
                                     if (stepFailure(STEP_REOPEN_FINISH, "蓝牙测试重新打开结束测试，测试结果【测试不通过】"))
                                         return false;
                                     mTestStep = STEP_DISCOVERY;
+                                    LogTools.p(TAG, "蓝牙测试重新打开，测试结果【测试通过】");
                                     break;
                                 case STEP_DISCOVERY:
                                     bt = controller.startDiscovery();
@@ -89,6 +91,7 @@ public class BluetoothTestTask extends BaseTestTask {
                                     if (stepFailure(STEP_DISCOVERY_OK, "蓝牙测试扫描，测试结果【测试不通过】"))
                                         return false;
                                     mTestStep = STEP_STOP_DISCOVERY;
+                                    LogTools.p(TAG, "蓝牙测试扫描，测试结果【测试通过】");
                                     break;
                                 case STEP_STOP_DISCOVERY:
                                     bt = controller.stopDisvcovery();
@@ -98,9 +101,11 @@ public class BluetoothTestTask extends BaseTestTask {
                                     if (stepFailure(STEP_STOP_DISCOVERY_OK, "蓝牙测试停止扫描，测试结果【测试不通过】"))
                                         return false;
                                     mExecuteState = STATE_FINISH;
+                                    LogTools.p(TAG, "蓝牙测试停止扫描，测试结果【测试通过】");
                                     break;
                             }
                         }
+                        Thread.sleep(500);
                     }
                     break;
                 case STATE_PAUSE:
@@ -116,9 +121,11 @@ public class BluetoothTestTask extends BaseTestTask {
                 case STATE_FINISH:
                     controller.complete();
                     isFinish = true;
+                    LogTools.p(TAG,"蓝牙完成测试");
                     break;
             }
         }
+        LogTools.p(TAG,"蓝牙测试任务结束");
         return isPass;
     }
 
@@ -160,6 +167,12 @@ public class BluetoothTestTask extends BaseTestTask {
                     } else if (mTestStep == STEP_REOPEN) {
                         mTestStep = STEP_REOPEN_FINISH;
                         mSync.notify();
+                    }else if (mTestStep == STEP_CLOSE){
+                        mTestStep = STEP_CLOSE_FAILURE;
+                        mSync.notify();
+                    }else if (mTestStep == STEP_RESET){
+                        mTestStep = STEP_OPEN;
+                        mSync.notify();
                     }
                     break;
                 case BluetoothConstants.OpenState.STATE_TURNED_OFF:
@@ -168,6 +181,11 @@ public class BluetoothTestTask extends BaseTestTask {
                         mSync.notify();
                     } else if (mTestStep == STEP_RESET) {
                         mTestStep = STEP_RESET_FINISHED;
+                        mSync.notify();
+                    }else if (mTestStep == STEP_OPEN){
+                        mTestStep = SETP_OPEN_FAILURE;
+                        mSync.notify();
+                    }else if (mTestStep == STEP_REOPEN){
                         mSync.notify();
                     }
                     break;
@@ -188,6 +206,11 @@ public class BluetoothTestTask extends BaseTestTask {
         synchronized (mSync) {
             if (mTestStep == STEP_STOP_DISCOVERY) {
                 mTestStep = STEP_STOP_DISCOVERY_OK;
+                mSync.notify();
+            }else if (mTestStep == STEP_DISCOVERY){
+                mTestStep = STEP_DISCOVERY_OK;
+                LogTools.p(TAG,"STEP_DISCOVERY notifyBtStopDiscovery 扫描完成 重新扫描");
+                ((BluetoothPresenter.Controller) mPresenter).startDiscovery();
                 mSync.notify();
             }
         }

@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.sinohb.hardware.test.entities.Calibration;
 import com.sinohb.hardware.test.module.screenadjust.ScreenAdjustController;
 import com.sinohb.hardware.test.module.screenadjust.ScreenAdjustPresenter;
+import com.sinohb.hardware.test.widget.CalibrationView;
 
 
 public class ScreenAdjustView extends Activity implements ScreenAdjustPresenter.View {
@@ -19,9 +20,9 @@ public class ScreenAdjustView extends Activity implements ScreenAdjustPresenter.
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        super.onCreate(savedInstanceState);
         new ScreenAdjustController(this);
         calibrationView = new CalibrationView(this);
         setContentView(calibrationView);

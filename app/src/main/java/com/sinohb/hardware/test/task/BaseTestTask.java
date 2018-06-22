@@ -15,7 +15,7 @@ public abstract class BaseTestTask implements Callable<Boolean> {
     protected int mTaskId;
     protected String mTaskName;
     protected boolean isFinish;
-    protected Object mSync = new Object();
+    protected final Object mSync = new Object();
     protected int mTestStep = 0;
     protected int mPreStep = 0;
     protected BasePresenter mPresenter;
