@@ -6,9 +6,6 @@ public class BluetoothConstants {
     private BluetoothConstants() {
     }
 
-    public static final int DEVICE_NOT_SUPPORT = Constants.DEVICE_NOT_SUPPORT;
-    public static final int DEVICE_SUPPORT = Constants.DEVICE_SUPPORTED;
-    public static final int DEVICE_RESET = 10000;
 
     public static class OpenState {
         public static final int STATE_TURNING_ON = 1;

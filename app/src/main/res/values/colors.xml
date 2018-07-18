@@ -3,7 +3,15 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
     <drawable name="red_drawable">#ff0000</drawable>
     <drawable name="green_drawable">#00ff00</drawable>
     <drawable name="blue_drawable">#0000ff</drawable>
+
+    <color name="white_color">#ffffff</color>
+    <color name="black_color">#000000</color>
+    <color name="left_nav_text_color">#929292</color>
+    <color name="left_nav_diver_color">#313131</color>
+    <color name="main_background_color">#111111</color>
+    <color name="left_nav_main_diver_color">#0a0a0a</color>
 </resources>

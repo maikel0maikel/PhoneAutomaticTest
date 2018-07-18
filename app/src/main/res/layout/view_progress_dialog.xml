@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:padding="10dp"
+    android:orientation="horizontal"
+    android:background="@mipmap/ic_dialog_view">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="正在结束任务..."
+        android:textColor="@color/white_color"
+        android:textSize="@dimen/x25"/>
+
+    <ProgressBar
+        android:layout_width="@dimen/x42"
+        android:layout_height="@dimen/y42" />
+
+</LinearLayout>

@@ -20,5 +20,12 @@
     <string name="lable_rear_view">rear view</string>
     <string name="lable_fan">fan</string>
     <string name="lable_temperature">temperature</string>
-
+    <string name="label_test_again">retest</string>
+    <string name="lable_see_detail">See Details</string>
+    <string name="lable_testing">testing...</string>
+    <string name="lable_testing_waite">Wait for the test...</string>
+    <string name="lable_testing_pause">pause test...</string>
+    <string name="lable_pass">Pass</string>
+    <string name="label_un_pass">Didn\'t  pass</string>
+    <string name="label_test_finish">test finish you can test again</string>
 </resources>

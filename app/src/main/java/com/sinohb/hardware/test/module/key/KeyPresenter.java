@@ -1,32 +1,17 @@
 package com.sinohb.hardware.test.module.key;
 
-import com.sinohb.hardware.test.app.BasePresenter;
-import com.sinohb.hardware.test.app.BaseView;
+import com.sinohb.hardware.test.app.BaseDisplayViewPresenter;
+import com.sinohb.hardware.test.app.BaseDisplayViewView;
+import com.sinohb.hardware.test.app.BaseExecutePresenter;
+import com.sinohb.hardware.test.app.BaseExecuteView;
 
 public interface KeyPresenter {
-    interface View extends BaseView<Controller> {
-        void showMenuView();
-
-        void showUpView();
-
-        void showDownView();
-
-        void showEnterView();
-
-        void showBackView();
+    interface View extends BaseDisplayViewView {
+        void pressKeyHint(int keyCode,int errorCount);
     }
 
-    interface Controller extends BasePresenter {
-
-        void pressKeyMenu();
-
-        void pressKeyUp();
-
-        void pressKeyDown();
-
-        void pressKeyEnter();
-
-        void pressKeyBack();
-
+    interface Controller extends BaseDisplayViewPresenter {
+        void pressKey(int keyCode,int error);
+        void notifyPressKey(int keyCode);
     }
 }

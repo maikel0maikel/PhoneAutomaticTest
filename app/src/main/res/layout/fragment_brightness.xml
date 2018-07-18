@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+
+    <Button
+        android:layout_weight="1"
+        android:id="@+id/bright_l_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_test_screen_bringhtness_l_hint"
+        android:background="@drawable/ic_button_selector"
+        android:textColor="@drawable/color_btn_selector"
+        android:layout_marginRight="@dimen/x24"
+        android:textSize="@dimen/x25" />
+
+
+    <Button
+        android:layout_weight="1"
+        android:id="@+id/bright_m_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_test_screen_bringhtness_m_hint"
+        android:background="@drawable/ic_button_selector"
+        android:textColor="@drawable/color_btn_selector"
+        android:layout_marginRight="@dimen/x24"
+        android:textSize="@dimen/x25" />
+
+
+
+    <Button
+        android:layout_weight="1"
+        android:id="@+id/bright_h_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_test_screen_bringhtness_h_hint"
+        android:background="@drawable/ic_button_selector"
+        android:textColor="@drawable/color_btn_selector"
+        android:textSize="@dimen/x25" />
+
+</LinearLayout>

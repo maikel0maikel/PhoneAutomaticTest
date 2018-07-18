@@ -1,5 +1,6 @@
 package com.sinohb.hardware.test;
 
+
 import com.sinohb.logger.SystemApplication;
 
 public class HardwareTestApplication extends SystemApplication{

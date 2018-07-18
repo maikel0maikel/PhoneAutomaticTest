@@ -23,7 +23,7 @@ public class GPSManager implements GPSManagerable {
     private boolean isStartGps;
     private boolean isStartNet;
     private GpsChangeListener listener;
-
+    private int satellites;
     GPSManager(GpsChangeListener listener) {
         mManager = (LocationManager) HardwareTestApplication.getContext().getSystemService(Context.LOCATION_SERVICE);
         mGPSState = isGPSEnable();
@@ -33,8 +33,8 @@ public class GPSManager implements GPSManagerable {
     @Override
     public boolean isGPSEnable() {
         boolean gps = mManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        boolean network = mManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        if (gps || network) {
+        //boolean network = mManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        if (gps) {
             return true;
         }
         return false;
@@ -61,25 +61,12 @@ public class GPSManager implements GPSManagerable {
         return Constants.DEVICE_SUPPORTED;
     }
 
-    private void startGpsLocate() {
-        if (mManager.isProviderEnabled(mManager.GPS_PROVIDER)) {
-            isStartGps = true;
-            mManager.requestLocationUpdates(mManager.GPS_PROVIDER, 0, 1, gpsLocationListener);
-        }
-    }
-
-    private void startNetLocate() {
-        if (mManager.isProviderEnabled(mManager.GPS_PROVIDER)) {
-            isStartNet = true;
-            mManager.requestLocationUpdates(mManager.GPS_PROVIDER, 1000l, 1, netLocationListener);
-        }
-    }
-
     @Override
-    public void destroy() {
-        if (!mGPSState) {
-            Settings.Secure.setLocationProviderEnabled(HardwareTestApplication.getContext().getContentResolver(), LocationManager.GPS_PROVIDER, false);
+    public int stopLocate() {
+        if (mManager == null) {
+            return Constants.DEVICE_NOT_SUPPORT;
         }
+        LogTools.p(TAG,"stopLocate");
         if (isStartGps) {
             mManager.removeUpdates(gpsLocationListener);
             isStartGps = false;
@@ -88,6 +75,36 @@ public class GPSManager implements GPSManagerable {
             mManager.removeUpdates(netLocationListener);
             isStartNet = false;
         }
+        mManager.removeGpsStatusListener(gpsStatuslistener);
+        return Constants.DEVICE_SUPPORTED;
+    }
+
+    private void startGpsLocate() {
+        if (mManager.isProviderEnabled(mManager.GPS_PROVIDER)) {
+            isStartGps = true;
+            mManager.requestLocationUpdates(mManager.GPS_PROVIDER, 0, 1, gpsLocationListener);
+            LogTools.p(TAG, "startGpsLocate gps  start locate");
+        } else {
+            LogTools.p(TAG, "startGpsLocate gps provider is not enable");
+        }
+    }
+
+    private void startNetLocate() {
+        if (mManager.isProviderEnabled(mManager.GPS_PROVIDER)) {
+            isStartNet = true;
+            mManager.requestLocationUpdates(mManager.GPS_PROVIDER, 1000l, 1, netLocationListener);
+            LogTools.p(TAG, "startNetLocate net start locate");
+        } else {
+            LogTools.p(TAG, "startNetLocate net provider is not enable");
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (!mGPSState) {
+            Settings.Secure.setLocationProviderEnabled(HardwareTestApplication.getContext().getContentResolver(), LocationManager.GPS_PROVIDER, false);
+        }
+        stopLocate();
     }
 
     private int realOpenGps() {
@@ -129,13 +146,13 @@ public class GPSManager implements GPSManagerable {
         public void onStatusChanged(String provider, int status, Bundle extras) {
             switch (status) {
                 case LocationProvider.AVAILABLE:
-                    LogTools.p(TAG, "当前GPS状态为可见状态");
+                    LogTools.p(TAG, "当前GPS状态为可见状态provider："+provider);
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
-                    LogTools.p(TAG, "当前GPS状态为服务区外状态");
+                    LogTools.p(TAG, "当前GPS状态为服务区外状态provider："+provider);
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    LogTools.p(TAG, "当前GPS状态为暂停服务状态");
+                    LogTools.p(TAG, "当前GPS状态为暂停服务状态provider："+provider);
                     break;
             }
         }
@@ -165,13 +182,13 @@ public class GPSManager implements GPSManagerable {
         public void onStatusChanged(String provider, int status, Bundle extras) {
             switch (status) {
                 case LocationProvider.AVAILABLE:
-                    LogTools.p(TAG, "当前GPS状态为可见状态");
+                    LogTools.p(TAG, "当前GPS状态为可见状态provider："+provider);
                     break;
                 case LocationProvider.OUT_OF_SERVICE:
-                    LogTools.p(TAG, "当前GPS状态为服务区外状态");
+                    LogTools.p(TAG, "当前GPS状态为服务区外状态provider："+provider);
                     break;
                 case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                    LogTools.p(TAG, "当前GPS状态为暂停服务状态");
+                    LogTools.p(TAG, "当前GPS状态为暂停服务状态provider："+provider);
                     break;
             }
         }
@@ -191,9 +208,12 @@ public class GPSManager implements GPSManagerable {
             switch (event) {
                 case GpsStatus.GPS_EVENT_FIRST_FIX:
                     LogTools.p(TAG, "第一次定位");
+                    if (listener!=null){
+                        listener.onGpsLocateStart();
+                    }
                     break;
                 case GpsStatus.GPS_EVENT_SATELLITE_STATUS:
-                    LogTools.p(TAG, "卫星状态改变");
+                    //LogTools.p(TAG, "卫星状态改变");
                     GpsStatus gpsStatus = mManager.getGpsStatus(null);
                     int maxSatellites = gpsStatus.getMaxSatellites();
                     Iterator<GpsSatellite> iters = gpsStatus.getSatellites()
@@ -203,13 +223,16 @@ public class GPSManager implements GPSManagerable {
                         GpsSatellite s = iters.next();
                         count++;
                     }
-                    LogTools.p(TAG, "搜索到：" + count + "颗卫星");
+                    satellites = count;
                     break;
                 case GpsStatus.GPS_EVENT_STARTED:
                     LogTools.p(TAG, "定位启动");
                     break;
                 case GpsStatus.GPS_EVENT_STOPPED:
                     LogTools.p(TAG, "定位结束");
+                    if (listener!=null){
+                        listener.onGpsLocateStop();
+                    }
                     break;
             }
         }
@@ -217,7 +240,7 @@ public class GPSManager implements GPSManagerable {
 
     private void locateChanged(Location location) {
         if (listener != null) {
-            listener.onLocationChanged(location);
+            listener.onLocationChanged(location,satellites);
         }
     }
 

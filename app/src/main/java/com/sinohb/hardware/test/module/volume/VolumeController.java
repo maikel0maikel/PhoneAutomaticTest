@@ -1,18 +1,24 @@
 package com.sinohb.hardware.test.module.volume;
 
-import com.sinohb.hardware.test.task.ThreadPool;
+import com.sinohb.hardware.test.app.BaseExecuteView;
+import com.sinohb.hardware.test.module.BaseExecuteController;
+import com.sinohb.hardware.test.module.media.IMediaplayer;
+import com.sinohb.hardware.test.module.media.MediapayerTester;
 
-import java.util.concurrent.FutureTask;
-
-public class VolumeController implements VolumePresenter.Controller{
-    private VolumePresenter.View mView;
+public class VolumeController extends BaseExecuteController implements VolumePresenter.Controller {
     private VolumeAdjustManagerable managerable;
     private IMediaplayer mediaplayer;
-    public VolumeController(VolumePresenter.View view){
-        this.mView = view;
+
+    public VolumeController(BaseExecuteView view) {
+        super(view);
+    }
+
+
+    @Override
+    protected void init() {
         managerable = new VolumeManager();
         mediaplayer = new MediapayerTester();
-        this.mView.setPresenter(this);
+        task = new VolumeTask(this);
     }
 
     @Override
@@ -30,23 +36,6 @@ public class VolumeController implements VolumePresenter.Controller{
         managerable.adjustHight();
     }
 
-    @Override
-    public void start() {
-        mediaplayer.play();
-        VolumeTask volumeTask = new VolumeTask(this);
-        FutureTask futureTask = new FutureTask(volumeTask);
-        ThreadPool.getPool().execute(futureTask);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
 
     @Override
     public void complete() {
@@ -54,8 +43,4 @@ public class VolumeController implements VolumePresenter.Controller{
         mediaplayer.destroy();
     }
 
-    @Override
-    public void destroy() {
-
-    }
 }

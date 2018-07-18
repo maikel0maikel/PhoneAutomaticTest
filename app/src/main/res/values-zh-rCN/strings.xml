@@ -20,4 +20,139 @@
     <string name="lable_rear_view">倒车后视</string>
     <string name="lable_fan">风扇</string>
     <string name="lable_temperature">温度检测</string>
+    <string name="label_test_again">重新测试</string>
+    <string name="lable_see_detail">查看详情</string>
+    <string name="lable_testing">正在测试...</string>
+    <string name="lable_testing_waite">等待测试...</string>
+    <string name="lable_testing_pause">暂停测试...</string>
+    <string name="lable_pass">通过</string>
+    <string name="label_un_pass">不通过</string>
+    <string name="label_test_finish">测试通过,您可以重新测试,单独测试该项</string>
+    <string name="label_test_fail">测试不通过，请查看详情或重新测试，单独测试该项</string>
+    <string name="label_bt_test_success_hint">蓝牙测试通过，请手动测试蓝牙连接、配对、蓝牙电话确保功能正常</string>
+
+    <string name="label_rgb_test_waite_hint">请注意观察屏幕,稍后将进行屏幕坏点测试</string>
+    
+    <string name="label_manual_test_finish">测试完成，请根据实际情况选择通过或不通过</string>
+
+    <string name="label_test_un_pass_btn_hint">您选择了不通过，稍后进入下一项测试，待所有项目测试结束后，可重新测试该项</string>
+    <string name="label_test_pass_btn_hint">您选择了通过，稍后进入下一项测试，待所有项目测试结束后，可重新测试该项</string>
+
+    <string name="label_test_screen_adjust_wait_hint">稍后将进行屏幕校准，请根据提示进行操作</string>
+
+    <string name="label_test_screen_brightness_wait_hint">稍后将进行屏幕亮度测试，请注意观察屏幕亮度变化</string>
+
+    <string name="label_test_screen_bringhtness_l_hint">低亮度</string>
+    <string name="label_test_screen_bringhtness_m_hint">中亮度</string>
+    <string name="label_test_screen_bringhtness_h_hint">高亮度</string>
+
+    <string name="label_test_radio_hint">稍后将进行收音机测试，请注意当播放电台时电台是否有更变</string>
+    <string name="label_test_radio_open_hint">正在测试收音机打开...</string>
+    <string name="label_test_radio_search_hint">正在测试收音机搜索...</string>
+    <string name="label_test_radio_play_hint">正在播放电台%1$.1f</string>
+    <string name="label_test_radio_close_hint">正在测试收音机关闭...</string>
+    <string name="label_test_radio_search_none_hint">没有搜索到任何电台，请插入信号发射器重试</string>
+
+    <string name="label_test_sound_effect_hint">稍后将进行音效测试，请注意音效是否有变化</string>
+    <string name="label_test_sound_effect_play_none">无音效播放</string>
+    <string name="label_test_sound_effect_play">有音效播放</string>
+
+    <string name="lable_left_front_btn">左前</string>
+    <string name="lable_left_rear_btn">左后</string>
+    <string name="lable_right_front_btn">右前</string>
+    <string name="lable_right_rear_btn">右后</string>
+    <string name="label_test_sound_amplifier_hint">分别点击四路功放并注意倾听</string>
+    <string name="label_left_front_hint">请注意倾听左前功放是否有声音</string>
+    <string name="label_left_rear_hint">请注意倾听左后功放是否有声音</string>
+    <string name="label_right_front_hint">请注意倾听右前功放是否有声音</string>
+    <string name="label_right_rear_hint">请注意倾听右后功放是否有声音</string>
+    <string name="label_amplifier_finish_hint">已经点击了四路功放，稍后按提示操作</string>
+
+    <string name="label_test_key_wait_hint">稍后将进行按键测试，请根据提示操作，错误操作三次视为不通过</string>
+    <string name="lable_test_key_home_hint">请按Home键</string>
+    <string name="lable_test_key_up_hint">请按向上键</string>
+    <string name="lable_test_key_down_hint">请按向下键</string>
+    <string name="lable_test_key_enter_hint">请按确定键</string>
+    <string name="lable_test_key_back_hint">请按返回键</string>
+    <string name="lable_test_key_error_hint">\n(错误%1$d次)</string>
+
+    <string name="label_test_knob_wait_hint">稍后将进行旋钮测试，请根据提示操作，错误操作三次视为不通过</string>
+    <string name="label_test_knob_counterclockwise_hint">请按逆时针操作旋钮</string>
+    <string name="label_test_knob_clockwise_hint">请按顺时针操作旋钮</string>
+
+    <string name="label_test_video_wait_hint">稍后将进行视频监控测试，请注意观察是否有预览图像，预览时间为5秒</string>
+    <string name="label_test_aux_hint">稍后将进行AUX测试，请插入AUX</string>
+    <string name="label_manual_test_aux_finish">检测到AUX已经插入，请根据实际情况选择通过或不通过</string>
+    <string name="label_test_rear_view_hint">稍后将进行倒车后视测试，请注意是否有启动倒车影像</string>
+    <string name="label_rear_start">启动倒车后视</string>
+    <string name="label_rear_stop">停止倒车后视</string>
+    <string name="label_test_detail_title_hint">所有测试项</string>
+    <string name="label_manual_test_detail_result_hint">测试结果：</string>
+    <string name="label_manual_test_detail_success_hint">所有测试项测试完成，人工干预结果为测试通过</string>
+    <string name="label_manual_test_detail_fail_hint">所有测试项测试完成，人工干预结果为测试不通过</string>
+
+    <string name="label_auto_test_detail_success_hint">所有测试项测试完成，测试通过</string>
+    <string name="label_auto_test_detail_fail_hint">所有测试项测试完成，测试不通过</string>
+
+    <string name="label_bt_open">打开蓝牙</string>
+    <string name="label_bt_reset">重置蓝牙</string>
+    <string name="label_bt_close">关闭蓝牙</string>
+    <string name="label_bt_reopen">重新打开蓝牙</string>
+    <string name="label_bt_discovery">扫描蓝牙</string>
+    <string name="label_bt_stop_discovery">停止扫描蓝牙</string>
+    <string name="label_aux_plug">AUX插入检测</string>
+
+    <string name="label_gps_locate">GPS定位</string>
+    <string name="label_gps_check">检测gps开启</string>
+    <string name="label_key_up">向上键</string>
+    <string name="label_key_down">向下键</string>
+    <string name="label_key_enter">确定键</string>
+    <string name="label_key_back">返回键</string>
+    <string name="label_knob_counterclockwise">旋钮逆时针</string>
+    <string name="label_knob_clockwise">旋钮顺时针</string>
+
+    <string name="label_radio_reset">收音机重置</string>
+    <string name="label_radio_open">收音机打开</string>
+    <string name="label_radio_search">收音机搜索</string>
+    <string name="label_radio_play">收音机播放</string>
+    <string name="label_radio_close">收音机关闭</string>
+    <string name="label_rgb_r">红色</string>
+    <string name="label_rgb_g">绿色</string>
+    <string name="label_rgb_b">蓝色</string>
+    <string name="label_adjust_left_top">屏幕左上角50像素处</string>
+    <string name="label_adjust_right_top">屏幕右上角50像素处</string>
+    <string name="label_adjust_left_bottom">屏幕左下角50像素处</string>
+    <string name="label_adjust_right_bottom">屏幕右下角50像素处</string>
+    <string name="label_adjust_center">屏幕中央</string>
+    <string name="label_serial_version">串口通讯获取记录仪版本</string>
+    <string name="label_storage_path">检测路径</string>
+    <string name="label_storage_read">检测读取文件内容</string>
+    <string name="label_video_preview">检测摄像头预览</string>
+
+    <string name="label_wifi_open">打开WIFI</string>
+    <string name="label_wifi_reset">重置WIFI</string>
+    <string name="label_wifi_close">关闭WIFI</string>
+    <string name="label_wifi_reopen">重新打开WIFI</string>
+    <string name="label_wifi_discovery">扫描热点</string>
+    <string name="label_wifi_connect">连接热点</string>
+    <string name="label_wifi_request">网络请求</string>
+
+    <string name="label_fan_turn_on">发送打开风扇指令</string>
+    <string name="label_fan_turn_off">发送关闭风扇指令</string>
+    <string name="label_fan_turn_on_btn">打开风扇</string>
+    <string name="label_fan_turn_off_btn">关闭风扇</string>
+    <string name="label_test_fan_hint">正在测试风扇，请依次点击打开/关闭按钮并注意观察风扇是否正常工作</string>
+    <string name="label_fan_turn_on_hint">打开风扇，请注意观察风扇是否正常运转</string>
+    <string name="label_fan_turn_off_hint">关闭风扇，请注意观察风扇是否正常关闭</string>
+    <string name="label_fan_notify_test_hint">风扇测试完毕，请稍后根据提示操作</string>
+
+    <string name="label_gps_start_locate">开始定位</string>
+    <string name="label_gps_stop_locate">定位结束</string>
+    <string name="label_emperature">温度检测</string>
+
+    <string name="label_start_task">开始</string>
+    <string name="label_stop_task">结束</string>
+    <string name="label_ok_btn">确定</string>
+    <string name="label_cancel_btn">取消</string>
+    <string name="label_task_executing_hint">测试任务正在进行\n您是否确认现在退出？</string>
 </resources>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_item_selector"
+    android:orientation="vertical">
+
+
+    <View
+        android:id="@+id/selected_v"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:background="@mipmap/ic_item_selected" />
+
+
+    <ImageView
+        android:id="@+id/icon_iv"
+        android:layout_width="@dimen/x42"
+        android:layout_height="@dimen/y42"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_wifi_selector" />
+
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_below="@id/icon_iv"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="3dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/label_wifi"
+            android:textSize="@dimen/x20"
+            android:textColor="@drawable/color_item_selector" />
+
+        <ImageView
+            android:id="@+id/pass_state_iv"
+            android:layout_width="@dimen/x22"
+            android:layout_height="@dimen/x22"
+            android:layout_gravity="right|center_vertical"
+            android:src="@mipmap/ic_item_test_pass"
+            android:layout_marginRight="2dp"/>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/diver_v"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/left_nav_diver_color" />
+
+</RelativeLayout>

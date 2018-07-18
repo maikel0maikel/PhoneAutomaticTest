@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp">
+
+
+
+    <Button
+        android:id="@+id/turn_on_fan_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_fan_turn_on_btn"
+        android:layout_gravity="bottom|left"
+        android:background="@drawable/ic_button_selector"
+        android:textColor="@drawable/color_btn_selector"
+        android:textSize="@dimen/x25" />
+
+
+
+    <Button
+        android:id="@+id/turn_off_fan_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_fan_turn_off_btn"
+        android:layout_gravity="right|bottom"
+        android:background="@drawable/ic_button_selector"
+        android:textColor="@drawable/color_btn_selector"
+        android:textSize="@dimen/x25" />
+
+    <TextView
+        android:id="@+id/hint_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center_horizontal"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:text="@string/label_test_fan_hint"
+        android:textColor="@drawable/color_btn_selector"
+        android:layout_marginTop="@dimen/y47"  />
+
+</FrameLayout>

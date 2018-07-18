@@ -4,7 +4,7 @@ import com.sinohb.hardware.test.app.BasePresenter;
 import com.sinohb.hardware.test.app.BaseView;
 
 public interface ScreenPresenter {
-    interface View extends BaseView<Controller>{
+    interface View extends BaseView<Controller> {
         void displayR();
 
         void displayG();

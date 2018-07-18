@@ -1,12 +1,17 @@
 package com.sinohb.hardware.test.module.bluetooth;
 
 
+import com.sinohb.hardware.test.HardwareTestApplication;
+import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.constant.BluetoothConstants;
-import com.sinohb.hardware.test.task.BaseTestTask;
+import com.sinohb.hardware.test.constant.Constants;
+import com.sinohb.hardware.test.constant.SerialConstants;
+import com.sinohb.hardware.test.entities.StepEntity;
+import com.sinohb.hardware.test.task.BaseAutoTestTask;
 import com.sinohb.logger.LogTools;
 
 
-public class BluetoothTestTask extends BaseTestTask {
+public class BluetoothTestTask extends BaseAutoTestTask {
     private static final String TAG = "BluetoothTestTask";
     private static final int STEP_OPEN = 1;
     private static final int SETP_OPEN_FINISH = 2;
@@ -22,136 +27,27 @@ public class BluetoothTestTask extends BaseTestTask {
     private static final int STEP_RESET_FINISHED = 12;
     private static final int SETP_OPEN_FAILURE = 14;
     private static final int STEP_CLOSE_FAILURE = 15;
+    private static final int STEP_RE_OPEN_FAILURE = 16;
+    private static final int STEP_RESET_FAILURE = 17;
+    private static final int[] STEP_TITLES = {R.string.label_bt_open, R.string.label_bt_close,
+            R.string.label_bt_reopen, R.string.label_bt_discovery, R.string.label_bt_stop_discovery};
+
     public BluetoothTestTask(BluetoothPresenter.Controller presenter) {
         super(presenter);
+        mTaskId = SerialConstants.ITEM_BLUETOOTH;
     }
 
-    @Override
-    public Boolean call() throws Exception {
-        boolean isPass = false;
-        BluetoothPresenter.Controller controller = (BluetoothPresenter.Controller) mPresenter;
-        LogTools.p(TAG, "蓝牙开始测试");
-        int bt = -10000;
-        while (!isFinish) {
-            switch (mExecuteState) {
-                case STATE_NONE:
-                    mExecuteState = STATE_RUNNING;
-                    LogTools.p(TAG, "蓝牙任务测试开启");
-                    mTestStep = STEP_OPEN;
-                    break;
-                case STATE_RUNNING:
-                    while (mExecuteState == STATE_RUNNING) {
-                        synchronized (mSync) {
-                            switch (mTestStep) {
-                                case STEP_OPEN:
-                                    LogTools.p(TAG, "蓝牙测试打开");
-                                    bt = controller.openBt();
-                                    if (bt == BluetoothConstants.DEVICE_RESET) {
-                                        LogTools.p(TAG,"蓝牙处于打开状态，关闭重置");
-                                        controller.closeBt();
-                                        mTestStep = STEP_RESET;
-                                        stepWaite(STEP_RESET);
-                                        break;
-                                    } else if (deviceNotSupport(bt)) return false;
-                                    stepWaite(STEP_OPEN);
-                                    if (stepFailure(SETP_OPEN_FINISH, "蓝牙测试打开，测试结果【测试不通过】"))
-                                        return false;
-                                    LogTools.p(TAG, "蓝牙测试打开结束，测试结果【测试通过】");
-                                    mTestStep = STEP_CLOSE;
-                                    break;
-                                case STEP_RESET_FINISHED:
-                                    mTestStep = STEP_OPEN;
-                                    LogTools.p(TAG,"重置成功");
-                                    break;
-                                case STEP_CLOSE:
-                                    LogTools.p(TAG, "蓝牙测试关闭");
-                                    bt = controller.closeBt();
-                                    if (deviceNotSupport(bt)) return false;
-                                    stepWaite(STEP_CLOSE);
-                                    if (stepFailure(STEP_CLOSE_FINISH, "蓝牙测试关闭，测试结果【测试不通过】"))
-                                        return false;
-                                    LogTools.p(TAG, "蓝牙测试关闭结束，测试结果【测试通过】");
-                                    mTestStep = STEP_REOPEN;
-                                    break;
-                                case STEP_REOPEN:
-                                    LogTools.p(TAG, "重新打开蓝牙");
-                                    bt = controller.openBt();
-                                    if (deviceNotSupport(bt)) return false;
-                                    stepWaite(STEP_REOPEN);
-                                    if (stepFailure(STEP_REOPEN_FINISH, "蓝牙测试重新打开结束测试，测试结果【测试不通过】"))
-                                        return false;
-                                    mTestStep = STEP_DISCOVERY;
-                                    LogTools.p(TAG, "蓝牙测试重新打开，测试结果【测试通过】");
-                                    break;
-                                case STEP_DISCOVERY:
-                                    bt = controller.startDiscovery();
-                                    if (deviceNotSupport(bt)) return false;
-                                    LogTools.p(TAG, "蓝牙测试扫描");
-                                    stepWaite(STEP_DISCOVERY);
-                                    if (stepFailure(STEP_DISCOVERY_OK, "蓝牙测试扫描，测试结果【测试不通过】"))
-                                        return false;
-                                    mTestStep = STEP_STOP_DISCOVERY;
-                                    LogTools.p(TAG, "蓝牙测试扫描，测试结果【测试通过】");
-                                    break;
-                                case STEP_STOP_DISCOVERY:
-                                    bt = controller.stopDisvcovery();
-                                    if (deviceNotSupport(bt)) return false;
-                                    LogTools.p(TAG, "蓝牙测试停止扫描");
-                                    stepWaite(STEP_STOP_DISCOVERY);
-                                    if (stepFailure(STEP_STOP_DISCOVERY_OK, "蓝牙测试停止扫描，测试结果【测试不通过】"))
-                                        return false;
-                                    mExecuteState = STATE_FINISH;
-                                    LogTools.p(TAG, "蓝牙测试停止扫描，测试结果【测试通过】");
-                                    break;
-                            }
-                        }
-                        Thread.sleep(500);
-                    }
-                    break;
-                case STATE_PAUSE:
-                    synchronized (mSync) {
-                        LogTools.p(TAG, "蓝牙测试任务暂停");
-                        try {
-                            mSync.wait();
-                        } catch (InterruptedException e) {
-                            LogTools.e(TAG, e);
-                        }
-                    }
-                    break;
-                case STATE_FINISH:
-                    controller.complete();
-                    isFinish = true;
-                    LogTools.p(TAG,"蓝牙完成测试");
-                    break;
-            }
-        }
-        LogTools.p(TAG,"蓝牙测试任务结束");
-        return isPass;
-    }
-
-    private boolean stepFailure(int setpOpenFinish, String s) {
-        if (mTestStep != setpOpenFinish) {
-            isFinish = true;
-            LogTools.p(TAG, s);
-            return true;
-        }
-        return false;
-    }
-
-    private void stepWaite(int stepOpen) {
-        while (mTestStep == stepOpen) {
-            try {
-                mSync.wait(TASK_WAITE_TIME);
-            } catch (InterruptedException e) {
-                LogTools.e(TAG, e);
-            }
+    protected void addStepEntity(int pos) {
+        for (int i = pos;i<STEP_TITLES.length;i++) {
+            StepEntity stepEntity = new StepEntity(i, HardwareTestApplication.getContext().getResources().getString(STEP_TITLES[i]), Constants.TestItemState.STATE_FAIL);
+            stepEntities.add(stepEntity);
         }
     }
 
     private boolean deviceNotSupport(int bt) {
-        if (BluetoothConstants.DEVICE_NOT_SUPPORT == bt) {
-            isFinish = true;
+        if (Constants.DEVICE_NOT_SUPPORT == bt) {
             LogTools.p(TAG, "蓝牙测试测试结果设备不支持【测试不通过】");
+            mExecuteState = STATE_TEST_UNPASS;
             return true;
         }
         return false;
@@ -167,11 +63,11 @@ public class BluetoothTestTask extends BaseTestTask {
                     } else if (mTestStep == STEP_REOPEN) {
                         mTestStep = STEP_REOPEN_FINISH;
                         mSync.notify();
-                    }else if (mTestStep == STEP_CLOSE){
+                    } else if (mTestStep == STEP_CLOSE) {
                         mTestStep = STEP_CLOSE_FAILURE;
                         mSync.notify();
-                    }else if (mTestStep == STEP_RESET){
-                        mTestStep = STEP_OPEN;
+                    } else if (mTestStep == STEP_RESET) {
+                        mTestStep = STEP_RESET_FAILURE;
                         mSync.notify();
                     }
                     break;
@@ -182,10 +78,11 @@ public class BluetoothTestTask extends BaseTestTask {
                     } else if (mTestStep == STEP_RESET) {
                         mTestStep = STEP_RESET_FINISHED;
                         mSync.notify();
-                    }else if (mTestStep == STEP_OPEN){
+                    } else if (mTestStep == STEP_OPEN) {
                         mTestStep = SETP_OPEN_FAILURE;
                         mSync.notify();
-                    }else if (mTestStep == STEP_REOPEN){
+                    } else if (mTestStep == STEP_REOPEN) {
+                        mTestStep = STEP_RE_OPEN_FAILURE;
                         mSync.notify();
                     }
                     break;
@@ -207,19 +104,169 @@ public class BluetoothTestTask extends BaseTestTask {
             if (mTestStep == STEP_STOP_DISCOVERY) {
                 mTestStep = STEP_STOP_DISCOVERY_OK;
                 mSync.notify();
-            }else if (mTestStep == STEP_DISCOVERY){
+            } else if (mTestStep == STEP_DISCOVERY) {
                 mTestStep = STEP_DISCOVERY_OK;
-                LogTools.p(TAG,"STEP_DISCOVERY notifyBtStopDiscovery 扫描完成 重新扫描");
+                LogTools.p(TAG, "STEP_DISCOVERY notifyBtStopDiscovery 扫描完成 重新扫描");
                 ((BluetoothPresenter.Controller) mPresenter).startDiscovery();
                 mSync.notify();
             }
         }
     }
 
-    public void stopTask() {
-        synchronized (mSync) {
-            isFinish = true;
-            mSync.notify();
+    @Override
+    protected void executeRunningState() throws InterruptedException {
+        int bt;
+        while (mExecuteState == STATE_RUNNING) {
+            synchronized (mSync) {
+                switch (mTestStep) {
+                    case STEP_OPEN:
+                        StepEntity stepEntity1 = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_open), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity1);
+                        LogTools.p(TAG, "蓝牙测试打开");
+                        bt = ((BluetoothPresenter.Controller) mPresenter).openBt();
+                        if (bt == Constants.DEVICE_RESET) {
+                            mTestStep = STEP_RESET;
+                            LogTools.p(TAG, "蓝牙处于打开状态，关闭重置");
+                            stepEntities.clear();
+                            break;
+                        } else if (deviceNotSupport(bt)) {
+                            stepEntity1.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(stepEntities.size());
+                            break;
+                        }
+                        mSync.wait();
+                        break;
+                    case STEP_RESET:
+                        LogTools.p(TAG, "STEP_RESET 关闭蓝牙重置");
+                        StepEntity stepEntity = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_reset), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity);
+                        bt = ((BluetoothPresenter.Controller) mPresenter).closeBt();
+                        if (deviceNotSupport(bt)) {
+                            stepEntity.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(0);
+                            break;
+                        }
+                        mSync.wait();
+                        break;
+                    case SETP_OPEN_FINISH:
+                        stepOk(STEP_CLOSE);
+                        LogTools.p(TAG, "蓝牙测试打开结束，测试结果【测试通过】");
+                        break;
+                    case SETP_OPEN_FAILURE:
+                        stepFail();
+                        LogTools.p(TAG, "蓝牙测试打开结束，测试结果【测试不通过】");
+                        break;
+                    case STEP_RESET_FINISHED:
+                        stepOk(STEP_OPEN);
+                        LogTools.p(TAG, "蓝牙重置成功");
+                        break;
+                    case STEP_RESET_FAILURE:
+                        stepFail();
+                        LogTools.p(TAG, "蓝牙重置失败，测试结果【测试不通过】");
+                        break;
+                    case STEP_CLOSE:
+                        LogTools.p(TAG, "蓝牙测试关闭");
+                        StepEntity stepEntity2 = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_close), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity2);
+                        bt = ((BluetoothPresenter.Controller) mPresenter).closeBt();
+                        if (deviceNotSupport(bt)) {
+                            stepEntity2.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(stepEntities.size());
+                            break;
+                        }
+                        mSync.wait();
+                        break;
+                    case STEP_CLOSE_FINISH:
+                        stepOk(STEP_REOPEN);
+                        LogTools.p(TAG, "蓝牙测试关闭结束，测试结果【测试通过】");
+                        break;
+                    case STEP_CLOSE_FAILURE:
+                        stepFail();
+                        LogTools.p(TAG, "蓝牙测试关闭结束，测试结果【测试不通过】");
+                        break;
+                    case STEP_REOPEN:
+                        LogTools.p(TAG, "重新打开蓝牙");
+                        StepEntity stepEntity3 = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_reopen), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity3);
+                        bt = ((BluetoothPresenter.Controller) mPresenter).openBt();
+                        if (deviceNotSupport(bt)) {
+                            stepEntity3.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(stepEntities.size());
+                            break;
+                        }
+                        mSync.wait();
+                        break;
+                    case STEP_REOPEN_FINISH:
+                        stepOk(STEP_DISCOVERY);
+                        LogTools.p(TAG, "蓝牙测试重新打开，测试结果【测试通过】");
+                        break;
+                    case STEP_RE_OPEN_FAILURE:
+                        stepFail();
+                        LogTools.p(TAG, "蓝牙测试重新打开，测试结果【测试不通过】");
+                        break;
+                    case STEP_DISCOVERY:
+                        StepEntity stepEntity4 = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_discovery), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity4);
+                        bt = ((BluetoothPresenter.Controller) mPresenter).startDiscovery();
+                        if (deviceNotSupport(bt)) {
+                            stepEntity4.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(stepEntities.size());
+                            break;
+                        }
+                        LogTools.p(TAG, "蓝牙测试扫描");
+                        mSync.wait();
+                        break;
+                    case STEP_DISCOVERY_OK:
+                        stepOk(STEP_STOP_DISCOVERY);
+                        LogTools.p(TAG, "蓝牙测试扫描，测试结果【测试通过】");
+                        break;
+                    case STEP_STOP_DISCOVERY:
+                        StepEntity stepEntity5 = new StepEntity(stepEntities.size() + 1, HardwareTestApplication.getContext().getResources().getString(R.string.label_bt_stop_discovery), Constants.TestItemState.STATE_TESTING);
+                        stepEntities.add(stepEntity5);
+                        bt = ((BluetoothPresenter.Controller) mPresenter).stopDisvcovery();
+                        LogTools.p(TAG, "蓝牙测试停止扫描");
+                        if (deviceNotSupport(bt)) {
+                            stepEntity5.setTestState(Constants.TestItemState.STATE_FAIL);
+                            addStepEntity(stepEntities.size());
+                            break;
+                        }
+                        mSync.wait();
+                        LogTools.p(TAG, "蓝牙测试停止扫描，测试结果【测试通过】");
+                        break;
+                    case STEP_STOP_DISCOVERY_OK:
+                        mExecuteState = STATE_FINISH;
+                        stepEntities.get(stepEntities.size() - 1).setTestState(Constants.TestItemState.STATE_SUCCESS);
+                        LogTools.e(TAG, "所有步骤执行结束");
+                        break;
+                }
+                Thread.sleep(500);
+            }
+//            Thread.sleep(500);
+        }
+    }
+
+    private void stepFail() {
+        mExecuteState = STATE_TEST_UNPASS;
+        stepEntities.get(stepEntities.size() - 1).setTestState(Constants.TestItemState.STATE_FAIL);
+        addStepEntity(stepEntities.size());
+    }
+
+    private void stepOk(int stepClose) {
+        mTestStep = stepClose;
+        stepEntities.get(stepEntities.size() - 1).setTestState(Constants.TestItemState.STATE_SUCCESS);
+    }
+
+    @Override
+    protected void startTest() {
+        stepEntities.clear();
+        mTestStep = STEP_OPEN;
+    }
+
+    @Override
+    protected void unpass() {
+        super.unpass();
+        if (stepEntities!=null&&stepEntities.isEmpty()){
+            addStepEntity(0);
         }
     }
 }

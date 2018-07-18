@@ -8,61 +8,76 @@ import android.location.Location;
 import android.location.LocationManager;
 
 import com.sinohb.hardware.test.HardwareTestApplication;
+import com.sinohb.hardware.test.app.BaseExecuteView;
 import com.sinohb.hardware.test.constant.Constants;
-import com.sinohb.hardware.test.task.ThreadPool;
+import com.sinohb.hardware.test.module.BaseExecuteController;
+import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.logger.LogTools;
 
-import java.util.concurrent.FutureTask;
 
-public class GPSController implements GPSPresenter.Controller, GPSManagerable.GpsChangeListener {
+public class GPSController extends BaseExecuteController implements GPSPresenter.Controller, GPSManagerable.GpsChangeListener {
     private static final String TAG = "GPSController";
     private GPSManagerable gpsManager;
-    private GPSPresenter.View mView;
     private GpsStateReceiver mReceiver;
-    private GPSTask gpsTask;
-    public GPSController(GPSPresenter.View view) {
+    private int gpsLocateCount = 0;
+    private boolean isStopLocate = false;
+    public GPSController(BaseExecuteView view) {
+        super(view);
+        init();
+    }
+
+    @Override
+    protected void init() {
         gpsManager = new GPSManager(this);
         registGPSReceiver();
-        this.mView = view;
-        this.mView.setPresenter(this);
+        task = new GPSTestTask(this);
     }
 
     private void registGPSReceiver() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
-        mReceiver = new GpsStateReceiver();
-        HardwareTestApplication.getContext().registerReceiver(mReceiver, filter);
+        if (mReceiver == null) {
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(LocationManager.PROVIDERS_CHANGED_ACTION);
+            mReceiver = new GpsStateReceiver();
+            HardwareTestApplication.getContext().registerReceiver(mReceiver, filter);
+        }
+//        mGpsMonitor = new GpsContentObserver(null);
 //        HardwareTestApplication.getContext().getContentResolver()
+//
 //                .registerContentObserver(Settings.Secure.getUriFor(Settings.Secure.LOCATION_PROVIDERS_ALLOWED),
 //                        false, mGpsMonitor);
     }
 
-//    private final ContentObserver mGpsMonitor = new ContentObserver(null) {
+    //private   ContentObserver mGpsMonitor;
+//    = new ContentObserver(null) {
 //
 //        @Override
 //
 //        public void onChange(boolean selfChange) {
 //            super.onChange(selfChange);
 //            notifyGpsState();
+//
 //        }
 //
 //    };
 
     private void notifyGpsState() {
-        boolean enable = gpsManager.isGPSEnable();
-        if (enable) {
-            gpsTask.notifyGPSOpened();
-        } else {
-            gpsTask.notifyGPSClosed();
+        boolean enable = gpsManager != null && gpsManager.isGPSEnable();
+        if (mView != null) {
+            if (enable) {
+                ((GPSPresenter.View) mView).notifyGPSState(1);
+            } else {
+                ((GPSPresenter.View) mView).notifyGPSState(0);
+            }
         }
+
     }
 
     private void unRegistGPSReceiver() {
-        if (mReceiver!=null){
+        if (mReceiver != null) {
             HardwareTestApplication.getContext().unregisterReceiver(mReceiver);
             mReceiver = null;
         }
-       // HardwareTestApplication.getContext().getContentResolver().unregisterContentObserver(mGpsMonitor);
+        // HardwareTestApplication.getContext().getContentResolver().unregisterContentObserver(mGpsMonitor);
     }
 
     @Override
@@ -77,40 +92,90 @@ public class GPSController implements GPSPresenter.Controller, GPSManagerable.Gp
 
     @Override
     public int startLocate() {
+        isStopLocate = false;
         return gpsManager == null ? Constants.DEVICE_NOT_SUPPORT : gpsManager.startLocate();
     }
 
     @Override
-    public void start() {
-        gpsTask = new GPSTask(this);
-        FutureTask futureTask = new FutureTask(gpsTask);
-        ThreadPool.getPool().execute(futureTask);
+    public int stopLocate() {
+        isStopLocate = true;
+        return gpsManager == null ? Constants.DEVICE_NOT_SUPPORT : gpsManager.stopLocate();
     }
 
     @Override
-    public void pause() {
-
+    public boolean isEnable() {
+        return gpsManager != null && gpsManager.isGPSEnable();
     }
 
     @Override
-    public void stop() {
-
+    public void startLocateInMain() {
+        if (mView != null) {
+            ((GPSPresenter.View) mView).startLocate();
+        }
     }
 
     @Override
-    public void complete() {
+    public void stopLocateInMain() {
+        if (mView != null) {
+            ((GPSPresenter.View) mView).stopLocate();
+        }
+    }
 
+    @Override
+    public void notifyGPSState(int state) {
+        if (mView != null) {
+            ((GPSPresenter.View) mView).notifyGPSState(state);
+        }
     }
 
     @Override
     public void destroy() {
         unRegistGPSReceiver();
-        gpsManager.destroy();
+        if (gpsManager != null) {
+            gpsManager.destroy();
+        }
     }
 
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location,int satellites) {
+        if (location != null) {
+            gpsLocateCount++;
+        }
+        if (gpsLocateCount >= 5) {
+            LogTools.p(TAG,"获取到5个gps点定位成功");
+            gpsLocateCount = 0;
+            if (task!=null){
+                ((GPSTestTask)task).notifyLocateSuccess();
+            }
+            if (gpsManager!=null){
+                gpsManager.stopLocate();
+            }
+            if(mView!=null){
+                ((GPSPresenter.View) mView).notifyLocateResult(location.getLatitude(),location.getLongitude(),satellites);
+            }
+        }
+    }
 
+    @Override
+    public void onGpsLocateStart() {
+        if (mView!=null){
+            ((GPSPresenter.View) mView).notifyGpsStartLocate();
+        }
+    }
+
+    @Override
+    public void onGpsLocateStop() {
+        if (mView!=null){
+            ((GPSPresenter.View) mView).notifyGpsStopLocate();
+        }
+    }
+
+    @Override
+    public void complete() {
+        super.complete();
+        if (!isStopLocate){
+            stopLocateInMain();
+        }
     }
 
     class GpsStateReceiver extends BroadcastReceiver {
@@ -118,9 +183,27 @@ public class GPSController implements GPSPresenter.Controller, GPSManagerable.Gp
         public void onReceive(Context context, Intent intent) {
             if (intent == null) return;
             LogTools.p(TAG, "intent.getAction():" + intent.getAction());
-            if ( LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
+            if (LocationManager.PROVIDERS_CHANGED_ACTION.equals(intent.getAction())) {
                 notifyGpsState();
             }
         }
     }
+//    class GpsContentObserver extends ContentObserver{
+//
+//        /**
+//         * Creates a content observer.
+//         *
+//         * @param handler The handler to run {@link #onChange} on, or null if none.
+//         */
+//        public GpsContentObserver(Handler handler) {
+//            super(handler);
+//        }
+//
+//        @Override
+//        public void onChange(boolean selfChange) {
+//            super.onChange(selfChange);
+//            LogTools.p(TAG,"onChange :"+selfChange);
+//        }
+//    }
+
 }

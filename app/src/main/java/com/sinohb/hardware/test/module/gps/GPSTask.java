@@ -19,7 +19,7 @@ public class GPSTask extends BaseTestTask {
     }
 
     @Override
-    public Boolean call() throws Exception {
+    public Integer call() throws Exception {
         int result = -10000;
         GPSPresenter.Controller controller = (GPSPresenter.Controller) mPresenter;
         while (!isFinish) {
@@ -45,7 +45,7 @@ public class GPSTask extends BaseTestTask {
                                         break;
                                     } else if (result == Constants.DEVICE_NOT_SUPPORT) {
                                         LogTools.p(TAG, "gps测试打开失败，设备不支持，测试不通过");
-                                        return false;
+                                        return 0;
                                     }
                                     mSync.wait();
                                     mTestStep = STEP_START_LOCATE;
@@ -60,7 +60,7 @@ public class GPSTask extends BaseTestTask {
                                     result = controller.startLocate();
                                     if (result == Constants.DEVICE_NOT_SUPPORT) {
                                         LogTools.p(TAG, "gps测试定位失败，设备不支持，测试不通过");
-                                        return false;
+                                        return 0;
                                     }
                                     mSync.wait();
                                     mTestStep = STEP_CLOSE;
@@ -71,7 +71,7 @@ public class GPSTask extends BaseTestTask {
                                     result = controller.closeGPS();
                                     if (result == Constants.DEVICE_NOT_SUPPORT) {
                                         LogTools.p(TAG, "gps测试关闭失败，设备不支持，测试不通过");
-                                        return false;
+                                        return 0;
                                     } else if (result == Constants.DEVICE_STATE_ERROR) {
                                         controller.openGPS();
                                         mTestStep = STEP_RESET_CLOSE;
@@ -102,7 +102,7 @@ public class GPSTask extends BaseTestTask {
             }
         }
         LogTools.p(TAG,"执行完成");
-        return true;
+        return isPass;
     }
 
     public void notifyGPSOpened() {

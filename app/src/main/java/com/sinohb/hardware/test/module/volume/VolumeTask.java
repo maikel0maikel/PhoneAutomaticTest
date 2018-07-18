@@ -16,8 +16,7 @@ public class VolumeTask extends BaseTestTask {
     }
 
     @Override
-    public Boolean call() throws Exception {
-        boolean pass = true;
+    public Integer call() throws Exception {
         VolumePresenter.Controller controller = (VolumePresenter.Controller) mPresenter;
         while (!isFinish) {
             switch (mExecuteState) {
@@ -56,7 +55,7 @@ public class VolumeTask extends BaseTestTask {
             }
         }
         LogTools.p(TAG, "音量测试结束");
-        return pass;
+        return isPass;
     }
 
     private void testing(VolumePresenter.Controller controller) throws InterruptedException {

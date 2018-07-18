@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/x355"
+    android:layout_height="@dimen/y235"
+    android:background="@mipmap/ic_dialog_view"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/y41"
+        android:layout_marginLeft="@dimen/x54"
+        android:layout_marginRight="@dimen/x54"
+        android:text="@string/label_task_executing_hint"
+        android:textColor="@color/white_color"
+        android:lineSpacingExtra="@dimen/y20"
+        android:textSize="@dimen/x25"/>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/x28"
+        android:paddingTop="@dimen/y50"
+        android:paddingBottom="@dimen/y14"
+        android:paddingRight="@dimen/x28">
+
+        <Button
+            android:id="@+id/dialog_ok_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/y57"
+            android:layout_weight="1"
+            android:background="@drawable/ic_button_selector"
+            android:text="@string/label_ok_btn"
+            android:layout_marginRight="@dimen/x20"
+            android:textColor="@color/white_color"
+            android:textSize="@dimen/x25"/>
+
+        <Button
+            android:id="@+id/dialog_cancel_btn"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/y57"
+            android:layout_weight="1"
+            android:background="@drawable/ic_button_selector"
+            android:text="@string/label_cancel_btn"
+            android:layout_marginLeft="@dimen/x20"
+            android:textColor="@color/white_color"
+            android:textSize="@dimen/x25"/>
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -13,7 +13,7 @@ public class VolumeManager implements VolumeAdjustManagerable {
     private int mCurrentVolumen;
     private int maxVolumen;
 
-    VolumeManager() {
+    public VolumeManager() {
         audioManager = (AudioManager) HardwareTestApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
         if (isEnable()) {
             mCurrentVolumen = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);

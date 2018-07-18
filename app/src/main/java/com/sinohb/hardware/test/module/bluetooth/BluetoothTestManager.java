@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 
 import com.sinohb.hardware.test.constant.BluetoothConstants;
+import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.module.bluetooth.subject.BluetoothSubjectManager;
 import com.sinohb.hardware.test.utils.BtUtils;
 import com.sinohb.logger.LogTools;
@@ -24,65 +25,65 @@ public class BluetoothTestManager implements BluetoothManagerable {
     public int open() {
         if (mDeviceBluetoothManager == null) {
             LogTools.e(TAG,"该设备不支持蓝牙[ method --->open ]");
-            return BluetoothConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (!mDeviceBluetoothManager.isEnabled()) {
             mDeviceBluetoothManager.enable();
         } else {
            // BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_ON);
-            return BluetoothConstants.DEVICE_RESET;
+            return Constants.DEVICE_RESET;
         }
-        return  BluetoothConstants.DEVICE_SUPPORT;
+        return  Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int close() {
         if (mDeviceBluetoothManager == null) {
             LogTools.e(TAG,"该设备不支持蓝牙[ method --->close ]");
-            return BluetoothConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (mDeviceBluetoothManager.isEnabled()) {
             mDeviceBluetoothManager.disable();
         } else {
             //BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
-            return BluetoothConstants.DEVICE_RESET;
+            return Constants.DEVICE_RESET;
         }
-        return  BluetoothConstants.DEVICE_SUPPORT;
+        return  Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int startDiscovery() {
         if (mDeviceBluetoothManager == null) {
             LogTools.e(TAG,"该设备不支持蓝牙[ method --->startDiscovery ]");
-            return BluetoothConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (mDeviceBluetoothManager.isEnabled() && !mDeviceBluetoothManager.isDiscovering()) {
             mDeviceBluetoothManager.startDiscovery();
         } else if (!mDeviceBluetoothManager.isEnabled()) {
             BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
         }
-        return  BluetoothConstants.DEVICE_SUPPORT;
+        return  Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int stopDiscovery() {
         if (mDeviceBluetoothManager == null) {
             LogTools.e(TAG,"该设备不支持蓝牙[ method --->stopDiscovery ]");
-            return BluetoothConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (mDeviceBluetoothManager.isDiscovering()) {
             mDeviceBluetoothManager.cancelDiscovery();
         } else {
             BluetoothSubjectManager.getInstance().notifyScanFinished();
         }
-        return  BluetoothConstants.DEVICE_SUPPORT;
+        return  Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int connect(String btAddress) {
         if (mDeviceBluetoothManager == null) {
             LogTools.e(TAG,"该设备不支持蓝牙[ method --->connect ]");
-            return BluetoothConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         BluetoothDevice device = mDeviceBluetoothManager.getRemoteDevice(btAddress);
         int boundState = device.getBondState();
@@ -95,7 +96,7 @@ public class BluetoothTestManager implements BluetoothManagerable {
                 createBond(device);
                 break;
         }
-        return  BluetoothConstants.DEVICE_SUPPORT;
+        return  Constants.DEVICE_SUPPORTED;
     }
 
     private void createBond(BluetoothDevice device) {

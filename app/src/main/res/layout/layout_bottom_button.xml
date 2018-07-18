@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <Button
+        android:id="@+id/retry_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/x96"
+        android:layout_marginRight="@dimen/x43"
+        android:layout_weight="1.0"
+        android:background="@drawable/ic_button_selector"
+        android:text="@string/label_test_again"
+        android:textColor="@color/white_color"
+        android:textSize="@dimen/x25" />
+
+    <Button
+        android:id="@+id/see_detail_btn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/x43"
+        android:layout_marginRight="@dimen/x96"
+        android:layout_weight="1.0"
+        android:background="@drawable/ic_button_selector"
+        android:text="@string/lable_see_detail"
+        android:textColor="@color/white_color"
+        android:textSize="@dimen/x25" />
+</LinearLayout>

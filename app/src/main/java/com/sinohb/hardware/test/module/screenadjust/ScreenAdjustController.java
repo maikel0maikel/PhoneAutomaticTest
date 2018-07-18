@@ -5,34 +5,51 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
+import com.sinohb.hardware.test.app.BaseExecuteView;
+import com.sinohb.hardware.test.app.BaseView;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.entities.Calibration;
+import com.sinohb.hardware.test.module.BaseController;
+import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.hardware.test.task.ThreadPool;
 import com.sinohb.logger.LogTools;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.FutureTask;
 
-public class ScreenAdjustController implements ScreenAdjustPresenter.Controller {
+public class ScreenAdjustController extends BaseController implements ScreenAdjustPresenter.Controller {
     private static final String TAG = "ScreenAdjustController";
-    private ScreenAdjustPresenter.View mView;
     private Calibration cal;
     static final int SAMPLE_COUNTS = 5;
     static final int EDGE_GAP = 50;
     private int X_RES;
     private int Y_RES;
     private AdjustHandler mHandler;
-    private ScreenAdjustTask adjustTask;
     private int mJustDirection;
 
-    public ScreenAdjustController(ScreenAdjustPresenter.View view) {
-        mView = view;
-        mView.setPresenter(this);
+    public ScreenAdjustController(BaseView view) {
+        super(view);
+        init();
+    }
+
+    @Override
+    protected void init() {
         DisplayMetrics metrics = ((Context) mView).getResources().getDisplayMetrics();
         X_RES = metrics.widthPixels;
         Y_RES = metrics.heightPixels;
         mHandler = new AdjustHandler(this);
         initScreenPoints();
+        task = new ScreenAdjustTask(this);
+    }
+
+    @Override
+    public void start() {
+        if (task != null && (task.getmExecuteState() == BaseTestTask.STATE_NONE || task.isFinish())) {
+            task.setFinish(false);
+            task.setmExecuteState(BaseTestTask.STATE_NONE);
+            FutureTask<Boolean> futureTask = new FutureTask(task);
+            ThreadPool.getPool().executeSingleTask(futureTask);
+        }
     }
 
     private void initScreenPoints() {
@@ -84,39 +101,32 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
     }
 
     @Override
-    public void adjustTouch(float tmpx, float tmpy) {
-        if (Math.abs(cal.xfb[mJustDirection] - tmpx) > 15 &&
-                Math.abs(cal.yfb[mJustDirection] - tmpy) > 15) {
-            adjustTask.adjustFailure(mJustDirection);
-            mView.adjustFailure(mJustDirection);
-            return;
-        }
+    public boolean adjustTouch(float tmpx, float tmpy) {
+        if (isRealRect(tmpx, tmpy)) return false;
 
         cal.x[mJustDirection] = (int) (tmpx * 4096.0 / (float) X_RES + 0.5);
         cal.y[mJustDirection] = (int) (tmpy * 4096.0 / (float) Y_RES + 0.5);
-        adjustTask.adjustOk(mJustDirection);
+        ((ScreenAdjustTask) task).adjustOk(mJustDirection);
+
+        return true;
     }
 
     @Override
-    public void start() {
-        startTask();
-    }
-
-    private void startTask() {
-        adjustTask = new ScreenAdjustTask(this);
-        FutureTask futureTask = new FutureTask(adjustTask);
-        ThreadPool.getPool().execute(futureTask);
-    }
-
-    @Override
-    public void pause() {
-
+    public boolean isRealRect(float tmpx, float tmpy) {
+        if (Math.abs(cal.xfb[mJustDirection] - tmpx) > 25 ||
+                Math.abs(cal.yfb[mJustDirection] - tmpy) > 25) {
+            ((ScreenAdjustTask) task).adjustFailure(mJustDirection);
+            ((ScreenAdjustPresenter.View) mView).adjustFailure(mJustDirection);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void stop() {
-
+    public BaseTestTask getTask() {
+        return task;
     }
+
 
     @Override
     public void complete() {
@@ -127,7 +137,7 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
         } else {
             mJustDirection = LEFT_TOP;
             LogTools.e(TAG, "Calibration failed");
-            startTask();
+            start();
         }
 
     }
@@ -207,13 +217,9 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
 
     private void saveCalibrationResult() {
         String res = String.format("%d %d %d %d %d %d %d", cal.a[1], cal.a[2], cal.a[0], cal.a[4], cal.a[5], cal.a[3], cal.a[6]);
-        LogTools.p(TAG,res);
+        LogTools.p(TAG, res);
     }
 
-    @Override
-    public void destroy() {
-
-    }
 
     private static class AdjustHandler extends Handler {
         private WeakReference<ScreenAdjustController> controllerWeakReference = null;
@@ -237,22 +243,22 @@ public class ScreenAdjustController implements ScreenAdjustPresenter.Controller 
             }
             switch (msg.what) {
                 case Constants.HandlerMsg.MSG_ADJUST_LEFT_TOP:
-                    controller.mView.displayAdjustView(LEFT_TOP, controller.cal);
+                    ((ScreenAdjustPresenter.View) controller.mView).displayAdjustView(LEFT_TOP, controller.cal);
                     break;
                 case Constants.HandlerMsg.MSG_ADJUST_RIGHT_TOP:
-                    controller.mView.displayAdjustView(RIGHT_TOP, controller.cal);
+                    ((ScreenAdjustPresenter.View) controller.mView).displayAdjustView(RIGHT_TOP, controller.cal);
                     break;
                 case Constants.HandlerMsg.MSG_ADJUST_LEFT_BOTTOM:
-                    controller.mView.displayAdjustView(LEFT_BOTTOM, controller.cal);
+                    ((ScreenAdjustPresenter.View) controller.mView).displayAdjustView(LEFT_BOTTOM, controller.cal);
                     break;
                 case Constants.HandlerMsg.MSG_ADJUST_RIGHT_BOTTOM:
-                    controller.mView.displayAdjustView(RIGHT_BOTTOM, controller.cal);
+                    ((ScreenAdjustPresenter.View) controller.mView).displayAdjustView(RIGHT_BOTTOM, controller.cal);
                     break;
                 case Constants.HandlerMsg.MSG_ADJUST_CENTER:
-                    controller.mView.displayAdjustView(CENTER, controller.cal);
+                    ((ScreenAdjustPresenter.View) controller.mView).displayAdjustView(CENTER, controller.cal);
                     break;
                 case Constants.HandlerMsg.MSG_ADJUST_COMPLETE:
-                    controller.mView.complete();
+                    controller.mView.complete(controller.task);
                     break;
             }
         }

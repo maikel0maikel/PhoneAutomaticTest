@@ -12,7 +12,6 @@ public interface ScreenAdjustPresenter {
 
         void adjustFailure(int direction);
 
-        void complete();
     }
 
     interface Controller extends BasePresenter {
@@ -27,7 +26,9 @@ public interface ScreenAdjustPresenter {
 
         void adjustCenter();
 
-        void adjustTouch(float x,float  y);
+        boolean adjustTouch(float x,float  y);
+
+        boolean isRealRect(float tmpx, float tmpy);
 
         static final int LEFT_TOP = 0;
         static final int RIGHT_TOP = 1;

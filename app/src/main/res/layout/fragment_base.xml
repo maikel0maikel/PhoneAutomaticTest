@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal"-->
+    <!--android:paddingTop="@dimen/y47"-->
+    <!--android:gravity="center">-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/test_state_tv"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:text="@string/lable_testing"-->
+    <!--android:textSize="25sp"-->
+    <!--android:textColor="@color/white_color"/>-->
+
+    <!--<ProgressBar-->
+    <!--style="@android:style/Widget.Holo.ProgressBar.Small"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_vertical" />-->
+    <!--</LinearLayout>-->
+
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="center_horizontal|bottom"-->
+    <!--android:paddingBottom="@dimen/y47"-->
+    <!--android:gravity="center">-->
+
+    <!--<Button-->
+    <!--android:id="@+id/left_btn"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginRight="@dimen/x43"-->
+    <!--android:layout_marginLeft="@dimen/x96"-->
+    <!--android:background="@drawable/ic_button_selector"-->
+    <!--android:text="@string/label_test_again"-->
+    <!--android:textSize="@dimen/x25"-->
+    <!--android:textColor="@color/white_color"-->
+    <!--android:layout_weight="1.0"/>-->
+
+    <!--<Button-->
+    <!--android:id="@+id/right_btn"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginLeft="@dimen/x43"-->
+    <!--android:layout_marginRight="@dimen/x96"-->
+    <!--android:background="@drawable/ic_button_selector"-->
+    <!--android:text="@string/lable_see_detail"-->
+    <!--android:textSize="@dimen/x25"-->
+    <!--android:textColor="@color/white_color"-->
+    <!--android:layout_weight="1.0"/>-->
+    <!--</LinearLayout>-->
+    <ViewStub
+        android:id="@+id/operate_hint_stub"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/y47"
+        android:layout_marginLeft="@dimen/x96"
+        android:layout_marginRight="@dimen/x96"
+        android:layout="@layout/layout_operate_hint"/>
+
+    <ViewStub
+        android:id="@+id/test_state_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/y47"
+        android:layout_marginLeft="@dimen/x96"
+        android:layout_marginRight="@dimen/x96"
+        android:layout="@layout/layout_test_state"/>
+
+
+    <ViewStub
+        android:id="@+id/retry_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:gravity="center"
+        android:layout="@layout/layout_bottom_button"
+        android:layout_marginBottom="@dimen/y47" />
+
+
+    <ViewStub
+        android:id="@+id/manual_stub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:gravity="center"
+        android:layout="@layout/layout_bottom_manual_btn"
+        android:layout_marginBottom="@dimen/y47" />
+
+    <ViewStub
+        android:id="@+id/other_stub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/fragment_other"/>
+
+    <ViewStub
+        android:id="@+id/detail_stub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/view_detail"
+        />
+</FrameLayout>

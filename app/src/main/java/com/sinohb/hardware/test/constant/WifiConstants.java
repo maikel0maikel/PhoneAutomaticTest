@@ -2,11 +2,6 @@ package com.sinohb.hardware.test.constant;
 
 
 public class WifiConstants {
-    public static final int DEVICE_NOT_SUPPORT = -1;
-    public static final int DEVICE_SUPPORT = 0;
-    public static final int DEVICE_RESET = 1;
-    public static final int DEVICE_CONNECTED = 10000;
-
     private WifiConstants() {
     }
 

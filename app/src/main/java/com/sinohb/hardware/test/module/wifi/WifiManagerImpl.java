@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 
 import com.sinohb.hardware.test.HardwareTestApplication;
+import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.constant.WifiConstants;
 import com.sinohb.hardware.test.module.wifi.subject.WifiSubjectManager;
 import com.sinohb.logger.LogTools;
@@ -25,50 +26,50 @@ public class WifiManagerImpl implements WifiManagerable {
     @Override
     public int openWifi() {
         if (mWifiManager == null) {
-            return WifiConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (!mWifiManager.isWifiEnabled()) {
             mWifiManager.setWifiEnabled(true);
         } else {
             //mWifiManager.setWifiEnabled(false);
             //WifiSubjectManager.getInstance().notifyConnectedState(WifiConstants.OpenOrCloseState.STATE_OPENED);
-            return WifiConstants.DEVICE_RESET;
+            return Constants.DEVICE_RESET;
         }
-        return WifiConstants.DEVICE_SUPPORT;
+        return Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int closeWifi() {
         if (mWifiManager == null) {
-            return WifiConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (mWifiManager.isWifiEnabled()) {
             mWifiManager.setWifiEnabled(false);
         } else {
             // WifiSubjectManager.getInstance().notifyConnectedState(WifiConstants.OpenOrCloseState.STATE_CLOSED);
-            return WifiConstants.DEVICE_RESET;
+            return Constants.DEVICE_NORMAL;
         }
-        return WifiConstants.DEVICE_SUPPORT;
+        return Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int startScan() {
         if (mWifiManager == null) {
-            return WifiConstants.DEVICE_NOT_SUPPORT;
+            return Constants.DEVICE_NOT_SUPPORT;
         }
         if (mWifiManager.isWifiEnabled()) {
             mWifiManager.startScan();
         } else {
 
         }
-        return WifiConstants.DEVICE_SUPPORT;
+        return Constants.DEVICE_SUPPORTED;
     }
 
     @Override
     public int connectWifi() {
         if (isSSIDConnected(WifiConstants.WifiConfigurate.SSID)) {
             LogTools.p(TAG, "设备已经连接");
-            return WifiConstants.DEVICE_CONNECTED;
+            return Constants.DEVICE_CONNECTED;
         }
         return realConnect();
     }
@@ -101,7 +102,7 @@ public class WifiManagerImpl implements WifiManagerable {
         boolean connected = mWifiManager.reconnect();
         LogTools.p(TAG, "realConnectSSID enableNetwork=" + enabled);
         LogTools.p(TAG, "realConnectSSID reconnect=" + connected);
-        return WifiConstants.DEVICE_SUPPORT;
+        return Constants.DEVICE_SUPPORTED;
     }
 
     private boolean isSSIDConnected(String ssid) {

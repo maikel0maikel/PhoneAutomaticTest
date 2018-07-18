@@ -19,12 +19,12 @@ import com.sinohb.logger.LogTools;
  * 【找到设备】
  */
 public class BluetoothEventReceiver extends BroadcastReceiver {
-    private static final String TAG = "BluetoothEventReceiver";
+    private static final String TAG = BluetoothEventReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        LogTools.e(TAG, "action=" + intent.getAction());
+        LogTools.p(TAG, "action=" + intent.getAction());
         if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
             int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
             switch (state) {
@@ -78,7 +78,7 @@ public class BluetoothEventReceiver extends BroadcastReceiver {
 
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {//discovery finish
             BluetoothSubjectManager.getInstance().notifyScanFinished();
-        }else if(action.equals("android.bluetooth.device.action.PAIRING_REQUEST")){
+        } else if (action.equals("android.bluetooth.device.action.PAIRING_REQUEST")) {
 
         }
     }

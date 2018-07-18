@@ -5,23 +5,27 @@ import android.bluetooth.BluetoothDevice;
 import android.content.IntentFilter;
 
 import com.sinohb.hardware.test.HardwareTestApplication;
+import com.sinohb.hardware.test.app.BaseExecuteView;
+import com.sinohb.hardware.test.module.BaseExecuteController;
 import com.sinohb.hardware.test.module.bluetooth.receiver.BluetoothEventReceiver;
 import com.sinohb.hardware.test.module.bluetooth.subject.BluetoothObserver;
 import com.sinohb.hardware.test.module.bluetooth.subject.BluetoothSubjectManager;
-import com.sinohb.hardware.test.task.ThreadPool;
+import com.sinohb.hardware.test.task.BaseTestTask;
 
-import java.util.concurrent.FutureTask;
-
-public class BluetoothController implements BluetoothPresenter.Controller, BluetoothObserver {
+public class BluetoothController extends BaseExecuteController implements BluetoothPresenter.Controller, BluetoothObserver {
 
     private BluetoothEventReceiver bluetoothReceiver;
-    private BluetoothPresenter.View mView;
     private BluetoothManagerable mBluetoothManager;
-    private BluetoothTestTask mTask;
 
-    public BluetoothController(BluetoothPresenter.View view) {
-        this.mView = view;
-        this.mView.setPresenter(this);
+    public BluetoothController(BaseExecuteView view) {
+        super(view);
+        init();
+    }
+
+    @Override
+    protected void init() {
+        registBluetoothReceiver();
+        task = new BluetoothTestTask(this);
         mBluetoothManager = new BLEManager();
         BluetoothSubjectManager.getInstance().attchBluetoothObserver(this);
     }
@@ -72,36 +76,11 @@ public class BluetoothController implements BluetoothPresenter.Controller, Bluet
 
     }
 
-    @Override
-    public void start() {
-        registBluetoothReceiver();
-        mTask = new BluetoothTestTask(this);
-        FutureTask task = new FutureTask(mTask);
-        ThreadPool.getPool().execute(task);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public void complete() {
-
-    }
 
     @Override
     public void destroy() {
         unregistBluetoothReceiver();
-        if (mTask != null) {
-            mTask.stopTask();
-        }
-        ThreadPool.getPool().destroy();
+        super.destroy();
     }
 
     private void registBluetoothReceiver() {
@@ -127,9 +106,9 @@ public class BluetoothController implements BluetoothPresenter.Controller, Bluet
 
     @Override
     public void notifyOpenState(int openedState) {
-        mView.notifyOpenOrCloseState(openedState);
-        if (mTask != null) {
-            mTask.notifyBtOpenState(openedState);
+        ((BluetoothPresenter.View) mView).notifyOpenOrCloseState(openedState);
+        if (task != null) {
+            ((BluetoothTestTask) task).notifyBtOpenState(openedState);
         }
     }
 
@@ -150,15 +129,20 @@ public class BluetoothController implements BluetoothPresenter.Controller, Bluet
 
     @Override
     public void notifyScanStarted() {
-        if (mTask != null) {
-            mTask.notifyBtStartDiscovery();
+        if (task != null) {
+            ((BluetoothTestTask) task).notifyBtStartDiscovery();
         }
     }
 
     @Override
     public void notifyScanFinished() {
-        if (mTask != null) {
-            mTask.notifyBtStopDiscovery();
+        if (task != null) {
+            ((BluetoothTestTask) task).notifyBtStopDiscovery();
         }
     }
+
+//    @Override
+//    public BaseTestTask getTask() {
+//        return null;
+//    }
 }

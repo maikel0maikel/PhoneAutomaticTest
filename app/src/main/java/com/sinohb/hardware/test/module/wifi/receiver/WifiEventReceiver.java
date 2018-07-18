@@ -19,10 +19,10 @@ public class WifiEventReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (WifiManager.WIFI_STATE_CHANGED_ACTION.equals(action)) {
-            LogTools.p(TAG, "action:" + action);
+            //LogTools.e(TAG, "action:" + action);
             //获取当前的wifi状态int类型数据
             int mWifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
-            LogTools.p(TAG, "wifi状态:" + mWifiState);
+            LogTools.p(TAG,"mWifiState:"+mWifiState);
             switch (mWifiState) {
                 case WifiManager.WIFI_STATE_ENABLED://已打开
                     WifiSubjectManager.getInstance().notifyOpenOrCloseState(WifiConstants.OpenOrCloseState.STATE_OPENED);
@@ -41,12 +41,12 @@ public class WifiEventReceiver extends BroadcastReceiver {
                     break;
             }
         } else if (WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(action)) {
-            LogTools.p(TAG, "action:" + action);
+            LogTools.e(TAG, "action:" + action);
         } else if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(action)) {//扫描完成
-            LogTools.p(TAG, "action:" + action);
+            LogTools.e(TAG, "action:" + action);
             WifiSubjectManager.getInstance().notifyScanFinished();
         } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
-            LogTools.p(TAG, "action:" + action);
+            LogTools.e(TAG, "action:" + action);
             // NetworkInfo info = (NetworkInfo) intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
             // LogTools.p(TAG, "网络状态变化:");
             NetworkInfo info = (NetworkInfo) intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
