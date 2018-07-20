@@ -184,6 +184,9 @@ public class CalibrationView extends View implements Runnable{
     }
 
     private void drawCalibration(Paint paint){
+        if(currentCal == null){
+            return;
+        }
         removeCallbacks(this);
         isTouch = false;
         cv.drawColor(Color.BLACK);

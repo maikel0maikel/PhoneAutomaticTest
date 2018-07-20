@@ -52,7 +52,7 @@ public class BLEManager implements BluetoothManagerable, BtearListener,BtearScan
             mDeviceBluetoothManager.powerOff();
         } else {
             //BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
-            return Constants.DEVICE_RESET;
+            return Constants.DEVICE_NORMAL;
         }
         return Constants.DEVICE_SUPPORTED;
     }

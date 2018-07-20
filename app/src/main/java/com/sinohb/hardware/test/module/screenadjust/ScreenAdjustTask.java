@@ -85,13 +85,12 @@ public class ScreenAdjustTask extends BaseTestTask {
                     }
                     break;
                 case STATE_FINISH:
-                    controller.complete();
                     LogTools.p(TAG,"屏幕校准完成");
                     isFinish = true;
                     break;
             }
-
         }
+        controller.complete();
         return isPass;
     }
 

@@ -49,7 +49,7 @@ public class ScreenRGBFragment extends BaseManualFragment {
         } else if (state == BaseTestTask.STATE_RUNNING) {
             isRequestStartTask = true;
             startRealTaskView();
-            LogTools.p(TAG,"启动activity");
+            LogTools.p(this.getClass().getSimpleName(),"启动activity");
         }
     }
 
@@ -62,7 +62,7 @@ public class ScreenRGBFragment extends BaseManualFragment {
     }
 
     protected void startTaskActivity() {
-        LogTools.p(TAG, "startTaskActivity");
+        LogTools.p(this.getClass().getSimpleName(), "startTaskActivity");
         Intent intent = new Intent(mainActivity, ScreenRGBActivity.class);
         startActivityForResult(intent, Activity.RESULT_FIRST_USER);
     }

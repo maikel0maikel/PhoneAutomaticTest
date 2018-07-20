@@ -79,8 +79,9 @@ public class BluetoothController extends BaseExecuteController implements Blueto
 
     @Override
     public void destroy() {
-        unregistBluetoothReceiver();
         super.destroy();
+        unregistBluetoothReceiver();
+        BluetoothSubjectManager.getInstance().detachBluetoothObserver(this);
     }
 
     private void registBluetoothReceiver() {
@@ -140,7 +141,7 @@ public class BluetoothController extends BaseExecuteController implements Blueto
             ((BluetoothTestTask) task).notifyBtStopDiscovery();
         }
     }
-
+//
 //    @Override
 //    public BaseTestTask getTask() {
 //        return null;

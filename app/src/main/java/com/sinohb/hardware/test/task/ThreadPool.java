@@ -17,9 +17,10 @@ public class ThreadPool {
     private static final int POOL_SIZE = 5;
     private List<Runnable> mAutoExecuteWorkerQueue = new LinkedList<>();
     private Worker[] mWorkers;
-    private QueueWorker mManualWorker;
+//    private QueueWorker mManualWorker;
+    private Worker mManualWorker;
     private List<Runnable> mManualWorkerQueue = new LinkedList<>();
-    private static final int CORE_SIZE = 1;
+    private static final int CORE_SIZE = 5;
     private static final int THREAD_SIZE = 5;
     private static final ThreadFactory TF = new ThreadFactory() {
         private AtomicInteger atomicInteger = new AtomicInteger(1);
@@ -48,7 +49,7 @@ public class ThreadPool {
             mWorkers[i] = new Worker(mAutoExecuteWorkerQueue);
             new Thread(mWorkers[i]).start();
         }
-        mManualWorker = new QueueWorker(mManualWorkerQueue);
+        mManualWorker = new Worker(mManualWorkerQueue);
         new Thread(mManualWorker).start();
         TASK_EXECUTOR = new ThreadPoolExecutor(CORE_SIZE, THREAD_SIZE, 60L, TimeUnit.SECONDS, new LinkedBlockingDeque<Runnable>(), TF);
     }
@@ -196,51 +197,51 @@ public class ThreadPool {
         }
     }
 
-    private class QueueWorker implements Runnable {
-        private boolean isRun = true;
-        private List<Runnable> workerQueue;
-
-        QueueWorker(List<Runnable> workerQueue) {
-            this.workerQueue = workerQueue;
-        }
-
-        @Override
-        public void run() {
-            if (workerQueue == null) {
-                return;
-            }
-            Runnable r = null;
-            while (isRun) {
-                synchronized (workerQueue) {
-                    while (isRun && workerQueue.isEmpty()) {
-                        try {
-                            workerQueue.wait();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (!workerQueue.isEmpty()) {
-                        r = workerQueue.remove(0);
-                    }
-                    LogTools.p(TAG, "mManualWorkerQueue:" + workerQueue.size());
-
-                }
-                if (r != null) {
-                    r.run();
-                    r = null;
-                }
-            }
-            LogTools.p(TAG, "pool结束工作：" + Thread.currentThread().getName());
-        }
-
-        public void stopWork() {
-            if (workerQueue == null) {
-                return;
-            }
-            synchronized (workerQueue) {
-                isRun = false;
-                workerQueue.notify();
-            }
-        }
-    }
+//    private class QueueWorker implements Runnable {
+//        private boolean isRun = true;
+//        private List<Runnable> workerQueue;
+//
+//        QueueWorker(List<Runnable> workerQueue) {
+//            this.workerQueue = workerQueue;
+//        }
+//
+//        @Override
+//        public void run() {
+//            if (workerQueue == null) {
+//                return;
+//            }
+//            Runnable r = null;
+//            while (isRun) {
+//                synchronized (workerQueue) {
+//                    while (isRun && workerQueue.isEmpty()) {
+//                        try {
+//                            workerQueue.wait();
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    if (!workerQueue.isEmpty()) {
+//                        r = workerQueue.remove(0);
+//                    }
+//                    LogTools.p(TAG, "mManualWorkerQueue:" + workerQueue.size());
+//
+//                }
+//                if (r != null) {
+//                    r.run();
+//                    r = null;
+//                }
+//            }
+//            LogTools.p(TAG, "pool结束工作：" + Thread.currentThread().getName());
+//        }
+//
+//        public void stopWork() {
+//            if (workerQueue == null) {
+//                return;
+//            }
+//            synchronized (workerQueue) {
+//                isRun = false;
+//                workerQueue.notify();
+//            }
+//        }
+//    }
 }

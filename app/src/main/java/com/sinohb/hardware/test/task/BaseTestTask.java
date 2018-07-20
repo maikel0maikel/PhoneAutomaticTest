@@ -20,7 +20,7 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     public static final int STATE_STEP_FINSH = 4;
     public static final int STATE_TEST_UNPASS = 5;
     public static final int STATE_TEST_WAIT_OPERATE = 6;
-    protected static final long TASK_WAITE_TIME = 1000 * 10;//15s
+    protected static final long TASK_WAITE_TIME = 1500 * 10;//15s
     protected int mExecuteState = STATE_NONE;
     protected int mTaskId;
     protected String mTaskName;

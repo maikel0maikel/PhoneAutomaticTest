@@ -109,4 +109,8 @@ public class WifiController extends BaseExecuteController implements WifiPresent
         super.destroy();
     }
 
+    @Override
+    public BaseTestTask getTask() {
+        return null;
+    }
 }

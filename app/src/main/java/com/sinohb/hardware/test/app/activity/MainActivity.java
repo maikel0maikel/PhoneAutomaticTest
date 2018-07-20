@@ -392,8 +392,8 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
                 break;
             case R.id.start_task_tv:
                 if (mPresenter != null) {
-                    mPresenter.start();
                     v.setEnabled(false);
+                    mPresenter.start();
                 }
                 break;
             case R.id.stop_task_tv:

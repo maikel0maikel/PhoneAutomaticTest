@@ -56,7 +56,6 @@ public class ScreenTask extends BaseTestTask {
                     }
                     break;
                 case STATE_FINISH:
-                    controller.complete();
                     isFinish = true;
                     break;
                 case STATE_STEP_FINSH:
@@ -76,6 +75,7 @@ public class ScreenTask extends BaseTestTask {
             }
         }
         LogTools.p(TAG, "屏幕测试结束");
+        controller.complete();
         return isPass;
     }
 

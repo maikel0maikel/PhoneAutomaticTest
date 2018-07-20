@@ -26,6 +26,7 @@ import com.sinohb.hardware.test.app.fragment.TemperatureFragment;
 import com.sinohb.hardware.test.app.fragment.USBFragment;
 import com.sinohb.hardware.test.app.fragment.VideoMonitorFragment;
 import com.sinohb.hardware.test.app.fragment.WifiFragment;
+import com.sinohb.hardware.test.constant.ConvertUtils;
 import com.sinohb.hardware.test.constant.SerialConstants;
 import com.sinohb.hardware.test.entities.SerialCommand;
 import com.sinohb.hardware.test.entities.TestItem;
@@ -89,17 +90,26 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
             @Override
             public void run() {
                 stopTask();
-                for (TestItem testItem:testItems){
+                for (TestItem testItem : testItems) {
                     testItem.setTestState(BaseTestTask.STATE_NONE);
                 }
-                if (mView!=null){
+                if (mView != null) {
                     mView.notifyTaskStart();
                 }
+                clearTasks(tasks);
+                clearTasks(manualTasks);
+                clearTasks(autoTasks);
                 addTestTask();
                 executeTasks();
             }
         });
 
+    }
+
+    private void clearTasks(List list) {
+        if (!list.isEmpty()) {
+            list.clear();
+        }
     }
 
     @Override
@@ -188,8 +198,11 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
                 if (mView != null) {
                     mView.notifyStartBtn();
                 }
-                transcatResult();
+
             }
+        }
+        if (completeSize == tasks.size()) {
+            transcatResult();
         }
         if (isTaskComplete() && isExit && mView != null) {
             mView.destroyView();
@@ -206,19 +219,82 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
         StringBuilder builder = new StringBuilder();
         builder.append("{\"CommandArray\": [");
         StringBuilder result = new StringBuilder();
-        int size = tasks.size() - 1;
-        for (int i = 0; i < size; i++) {
-            BaseTestTask task = tasks.get(i);
-            builder.append("\"").append(task.getmTaskId()).append("\"").append(",");
-            result.append("\"").append(task.isPass()).append("\"").append(",");
+        String [] arraySrc = {"","","",""};
+        int count = 32;
+        byte[] array = new byte[count];
+        for (BaseTestTask task : tasks) {
+            array[task.getmTaskId()] = (byte) task.isPass();
         }
-        builder.append("\"").append(tasks.get(size).getmTaskId()).append("\"").append(",");
-        result.append("\"").append(tasks.get(size).isPass()).append("\"").append("]}");
-        builder.append(result);
+        int k = 0;
+        for (int i = 8; i < count; i +=8 ) {
+            for (int j=i-1;j>=0;j--){
+                result.append(array[j]);
+                if (i == j+8){
+                    arraySrc[k++] = result.toString();
+                    result.delete(0,result.length());
+                }
+            }
+        }
+
+
+//        int j;
+//        for (int i = 0; i < count; i++) {
+//            if (i < 8) {
+//                byte1 = getByteSrc(result, byte1, i, 7 - i, 7);
+//            } else if (i < 16) {
+//                byte2 = getByteSrc(result, byte2, i, 15 - i + 8, 15);
+//            } else if (i < 24) {
+//                byte3 = getByteSrc(result, byte3, i, 23 - i + 16, 23);
+//            } else {
+//                j = 31 - i + 24;
+//                if (j < tasks.size()) {
+//                    BaseTestTask task = tasks.get(j);
+//                    result.append(task.isPass());
+//                } else {
+//                    result.append(0);
+//                }
+//            }
+//        }
+//        byte4 = result.toString();
+        result.setLength(0);
+        LogTools.p(TAG, "byte1:" + arraySrc[0] + ",byte2:" + arraySrc[1]  + ",byte3:" +  arraySrc[2]  + ",byte4:" +  arraySrc[3] );
+        byte transcat1 = ConvertUtils.bitToByte(arraySrc[0]);
+        byte transcat2 = ConvertUtils.bitToByte(arraySrc[1] );
+        byte transcat3 = ConvertUtils.bitToByte(arraySrc[2]);
+        byte transcat4 = ConvertUtils.bitToByte(arraySrc[3]);
+        builder.append("\"0x").append(Integer.toHexString(transcat1)).append("\",\"0x").
+                append(Integer.toHexString(transcat2)).append("\",\"0x").
+                append(Integer.toHexString(transcat3)).append("\",\"0x").append(Integer.toHexString(transcat4)).append("\"]}");
+        LogTools.p(TAG, "transcat1:" + transcat1 + ",transcat2:" + transcat2 + ",transcat3:" + transcat3 + ",transcat4:" + transcat4);
+//        int size = tasks.size() - 1;
+//        for (int i = 0; i < size; i++) {
+//            BaseTestTask task = tasks.get(i);
+//            builder.append("\"").append(task.getmTaskId()).append("\"").append(",");
+//            result.append("\"").append(task.isPass()).append("\"").append(",");
+//        }
+//        builder.append("\"").append(tasks.get(size).getmTaskId()).append("\"").append(",");
+//        result.append("\"").append(tasks.get(size).isPass()).append("\"").append("]}");
+//        builder.append(result);
         String data = builder.toString();
         LogTools.p(TAG, "transcatResult builder:" + data);
         SerialCommand c = new SerialCommand(SerialConstants.SERIAL_TRANSACT_TEST_RESULTS_NO, SerialConstants.ID_TEST_RESULTS, data, this);
-        //RFCFactory.getInstance().sendMsg(c);
+        RFCFactory.getInstance().sendMsg(c);
+    }
+
+    private String getByteSrc(StringBuilder result, String byte1, int i, int i2, int i3) {
+        int j;
+        j = i2;
+        if (j < tasks.size()) {
+            BaseTestTask task = tasks.get(j);
+            result.append(task.isPass());
+        } else {
+            result.append(0);
+        }
+        if (i == i3) {
+            byte1 = result.toString();
+            result.delete(0, result.length());
+        }
+        return byte1;
     }
 
     @Override

@@ -37,7 +37,7 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
             task.setmExecuteState(BaseTestTask.STATE_NONE);
             task.setManaul(true);
             FutureTask<Boolean> futureTask = new FutureTask(task);
-            ThreadPool.getPool().execute(futureTask);
+            ThreadPool.getPool().executeSingleTask(futureTask);
         }
     }
 
@@ -92,7 +92,7 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
         if (data.length()>0){
             SerialCommand c = new SerialCommand(SerialConstants.SERIAL_TRANSACT_RESULT_NO, SerialConstants.ID_TEST_DETIAL,
                     data, this);
-            //RFCFactory.getInstance().sendMsg(c);
+            RFCFactory.getInstance().sendMsg(c);
         }
         builder.setLength(0);
     }
@@ -105,7 +105,7 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
         if (task.isManaul()){
             SerialCommand c = new SerialCommand(SerialConstants.SERIAL_UPDATE_RESULT_NO, SerialConstants.ID_UPDATE_RESULT,
                     "{\"CommandArray\": [\""+task.getmTaskId()+"\",\""+task.isPass()+"\"]}", this);
-           // RFCFactory.getInstance().sendMsg(c);
+            RFCFactory.getInstance().sendMsg(c);
         }
     }
 

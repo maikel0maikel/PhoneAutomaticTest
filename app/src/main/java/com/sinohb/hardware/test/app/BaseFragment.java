@@ -275,10 +275,10 @@ public class BaseFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.retry_btn:
+                v.setEnabled(false);
                 if (mPresenter != null) {
                     mPresenter.start();
                 }
-                v.setEnabled(false);
                 break;
             case R.id.see_detail_btn:
                 seeDetail();
