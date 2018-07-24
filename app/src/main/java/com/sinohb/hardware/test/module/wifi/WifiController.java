@@ -50,8 +50,8 @@ public class WifiController extends BaseExecuteController implements WifiPresent
     }
 
     @Override
-    public int connectWifi() {
-        return mWifiManager == null ? Constants.DEVICE_NOT_SUPPORT : mWifiManager.connectWifi();
+    public int connectWifi(String ssid,String pwd) {
+        return mWifiManager == null ? Constants.DEVICE_NOT_SUPPORT : mWifiManager.connectWifi(ssid,pwd);
     }
 
     @Override
@@ -109,8 +109,8 @@ public class WifiController extends BaseExecuteController implements WifiPresent
         super.destroy();
     }
 
-    @Override
-    public BaseTestTask getTask() {
-        return null;
-    }
+//    @Override
+//    public BaseTestTask getTask() {
+//        return null;
+//    }
 }

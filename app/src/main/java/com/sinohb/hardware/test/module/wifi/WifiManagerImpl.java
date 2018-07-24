@@ -66,27 +66,33 @@ public class WifiManagerImpl implements WifiManagerable {
     }
 
     @Override
-    public int connectWifi() {
-        if (isSSIDConnected(WifiConstants.WifiConfigurate.SSID)) {
+    public int connectWifi(String ssid,String pwd) {
+        if (ssid == null||ssid.length()==0){
+            ssid = WifiConstants.WifiConfigurate.SSID;
+        }
+        if (isSSIDConnected(ssid)) {
             LogTools.p(TAG, "设备已经连接");
             return Constants.DEVICE_CONNECTED;
         }
-        return realConnect();
+        return realConnect(ssid,pwd);
     }
 
-    private int realConnect() {
+    private int realConnect(String ssid,String pwd) {
         List<ScanResult> scanResultList = mWifiManager.getScanResults();
         for (ScanResult result : scanResultList) {
-            if (result.SSID.equalsIgnoreCase(WifiConstants.WifiConfigurate.SSID)) {
-                return realConnectSSID(result.SSID);
+            if (result.SSID.equalsIgnoreCase(ssid)) {
+                return realConnectSSID(result.SSID,pwd);
             }
         }
         LogTools.p(TAG, "未找到SSID直接去连接");
-       return realConnectSSID(WifiConstants.WifiConfigurate.SSID);
+       return realConnectSSID(ssid,pwd);
     }
 
-    private int realConnectSSID(String ssid) {
-        WifiConfiguration wifiConfig = createWifiInfo(ssid, "12345678", WifiCipherType.WIFICIPHER_WPA);
+    private int realConnectSSID(String ssid,String pwd) {
+        if (pwd == null||pwd.length()==0){
+            pwd = "12345678";
+        }
+        WifiConfiguration wifiConfig = createWifiInfo(ssid, pwd, WifiCipherType.WIFICIPHER_WPA);
         if (wifiConfig == null) {
             LogTools.e(TAG, "createWifiInfo null connect failure");
             WifiSubjectManager.getInstance().notifyConnectedState(WifiConstants.ConnectState.STATE_CONNECT_FAILURE);

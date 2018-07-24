@@ -76,8 +76,8 @@ public class RearViewTestTask extends BaseManualTestTask {
                         break;
                     case REAR_START_OK:
                         LogTools.p(TAG, "倒车后视启动成功");
+                        Thread.sleep(3000);
                         mTestStep = REAR_STOP;
-                        mSync.wait(5000);
                         break;
                     case REAR_COMMAND_SEND_FAILURE:
                         LogTools.e(TAG, "指令发送失败");

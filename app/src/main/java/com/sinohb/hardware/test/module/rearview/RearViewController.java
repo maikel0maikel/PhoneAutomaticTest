@@ -73,9 +73,8 @@ public class RearViewController extends RFCController implements RearViewPresent
             ((RearViewTestTask) task).sendFailure();
         }
     }
-//
-//    @Override
-//    public BaseTestTask getTask() {
-//        return null;
-//    }
+    @Override
+    public BaseTestTask getTask() {
+        return task;
+    }
 }

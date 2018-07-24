@@ -2,6 +2,8 @@ package com.sinohb.hardware.test.module.wifi;
 
 
 
+import android.os.Environment;
+
 import com.sinohb.hardware.test.HardwareTestApplication;
 import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.constant.Constants;
@@ -9,9 +11,17 @@ import com.sinohb.hardware.test.constant.SerialConstants;
 import com.sinohb.hardware.test.constant.WifiConstants;
 import com.sinohb.hardware.test.entities.StepEntity;
 import com.sinohb.hardware.test.task.BaseAutoTestTask;
+import com.sinohb.hardware.test.utils.FileUtils;
 import com.sinohb.logger.LogTools;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.cert.CertificateException;
@@ -302,7 +312,23 @@ public class WifiTestTask extends BaseAutoTestTask {
                             e.printStackTrace();
                         }
                         LogTools.p(TAG, "Wifi测试连接");
-                        result = ((WifiPresenter.Controller) mPresenter).connectWifi();
+                        String ssid = "";
+                        String pwd = "";
+                        /**
+                         * 读取配置文件中的热点
+                         */
+                        try {
+                            String json = FileUtils.getFileContent(Environment.getExternalStorageDirectory().getAbsolutePath()+"/wifiConfig.txt");
+                            JSONObject object = new JSONObject(json);
+                            ssid = object.getString("ssid");
+                            pwd = object.getString("pwd");
+                            LogTools.p(TAG,"ssid:"+ssid+",pwd:"+pwd);
+                        } catch (IOException e) {
+                            LogTools.e(TAG,"读取wifi热点失败");
+                        } catch (JSONException e) {
+                            LogTools.e(TAG,e,"读取wifi热点失败");
+                        }
+                        result = ((WifiPresenter.Controller) mPresenter).connectWifi(ssid,pwd);
                         if (result == Constants.DEVICE_CONNECTED) {
                             LogTools.p(TAG, "Wifi已经连接");
                             mTestStep = STEP_CONNECT_OK;
@@ -341,6 +367,7 @@ public class WifiTestTask extends BaseAutoTestTask {
                         break;
                 }
             }
+            Thread.sleep(100);
         }
     }
 
@@ -365,5 +392,7 @@ public class WifiTestTask extends BaseAutoTestTask {
         mTestStep = step;
         stepEntities.get(i).setTestState(Constants.TestItemState.STATE_SUCCESS);
     }
+
+
 
 }

@@ -6,14 +6,11 @@ import com.sinohb.hardware.test.app.BasePresenter;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.entities.StepEntity;
 import com.sinohb.hardware.test.task.BaseAutoTestTask;
+import com.sinohb.hardware.test.utils.FileUtils;
 import com.sinohb.logger.LogTools;
-import com.sinohb.logger.utils.IOUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class USBTestTask extends BaseAutoTestTask {
     private static final String TAG = USBTestTask.class.getSimpleName();
@@ -28,8 +25,10 @@ public class USBTestTask extends BaseAutoTestTask {
     @Override
     protected void initStepEntity() {
         super.initStepEntity();
-        StepEntity stepEntity1 = new StepEntity(1, HardwareTestApplication.getContext().getResources().getString(R.string.label_storage_path), Constants.TestItemState.STATE_TESTING);
-        StepEntity stepEntity2 = new StepEntity(2, HardwareTestApplication.getContext().getResources().getString(R.string.label_storage_read), Constants.TestItemState.STATE_TESTING);
+        StepEntity stepEntity1 = new StepEntity(1, HardwareTestApplication.getContext().getResources().
+                getString(R.string.label_storage_path), Constants.TestItemState.STATE_TESTING);
+        StepEntity stepEntity2 = new StepEntity(2, HardwareTestApplication.getContext().getResources().
+                getString(R.string.label_storage_read), Constants.TestItemState.STATE_TESTING);
         stepEntities.add(stepEntity1);
         stepEntities.add(stepEntity2);
     }
@@ -56,20 +55,10 @@ public class USBTestTask extends BaseAutoTestTask {
                 if (file.exists()) {//读取一文件
                     ((USBPresenter.Controller) mPresenter).notifyStatus(1);
                     stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
-                    stepEntities.get(0).setStepTitle(stepEntities.get(0).getStepTitle() + usbPath);
-                    FileInputStream fis = null;
-                    BufferedReader reader = null;
+                    stepEntities.get(0).setStepTitle(HardwareTestApplication.getContext().getResources().getString(R.string.label_storage_path) + usbPath);
                     try {
-                        fis = new FileInputStream(usbPath + "/test.txt");
-                        reader = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
-                        StringBuilder builder = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            builder.append(line);
-                        }
-                        line = builder.toString();
-                        LogTools.p(TAG, "文件内容：" + line);
-                        builder.setLength(0);
+                        String content = FileUtils.getFileContent(usbPath + "/test.txt");
+                        LogTools.p(TAG, "文件内容：" + content);
                         isPass = 1;
                         mExecuteState = STATE_FINISH;
                         stepEntities.get(1).setTestState(Constants.TestItemState.STATE_SUCCESS);
@@ -88,9 +77,6 @@ public class USBTestTask extends BaseAutoTestTask {
                         } catch (InterruptedException e1) {
                             e1.printStackTrace();
                         }
-                    } finally {
-                        IOUtils.closeQuietly(fis);
-                        IOUtils.closeQuietly(reader);
                     }
                 } else {
                     ((USBPresenter.Controller) mPresenter).notifyStatus(0);

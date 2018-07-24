@@ -57,7 +57,7 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
 
     @Override
     public BaseTestTask getTask() {
-        return task;
+        return null;
     }
 
     @Override
@@ -76,17 +76,17 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
         }
         List<StepEntity> stepEntities = task.getStepEntities();
         StringBuilder builder = new StringBuilder();
-        builder.append("{\"ID\":").append(task.getmTaskId()).append(",").append("\"result\":").append("\"\n");
+        builder.append("{\"ID\":").append(task.getmTaskId()).append(",").append("\"result\":").append("\"");
         if (stepEntities!=null){
             int i = 1;
             for (StepEntity entity:stepEntities){
                 String pass = entity.getTestState()== Constants.TestItemState.STATE_SUCCESS?
                         HardwareTestApplication.getContext().getResources().getString(R.string.lable_pass): HardwareTestApplication.getContext().getResources().getString(R.string.label_un_pass);
-                builder.append(i).append(".").append(entity.getStepTitle()).append("(").append(pass).append(")").append("\n");
+                builder.append(i).append(".").append(entity.getStepTitle()).append("(").append(pass).append(")").append("\r\n");
                 i++;
             }
         }
-        builder.append("\"}");
+        builder.append("\r\n\"}");
         String data = builder.toString();
         LogTools.p(TAG,"单个测试结果：data:"+data);
         if (data.length()>0){
@@ -104,7 +104,7 @@ public abstract class BaseController implements BasePresenter,RFCSendListener{
         }
         if (task.isManaul()){
             SerialCommand c = new SerialCommand(SerialConstants.SERIAL_UPDATE_RESULT_NO, SerialConstants.ID_UPDATE_RESULT,
-                    "{\"CommandArray\": [\""+task.getmTaskId()+"\",\""+task.isPass()+"\"]}", this);
+                    "{\"CommandArray\": [\"0x"+Integer.toHexString(task.getmTaskId()&0xFF)+"\",\""+task.isPass()+"\"]}", this);
             RFCFactory.getInstance().sendMsg(c);
         }
     }

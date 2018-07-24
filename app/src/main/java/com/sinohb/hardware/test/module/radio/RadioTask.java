@@ -40,8 +40,9 @@ public class RadioTask extends BaseManualTestTask {
         mTaskId = SerialConstants.ITEM_RADIO;
     }
 
-
-    private void addStepEntity() {
+    @Override
+    protected void initStepEntity() {
+        super.initStepEntity();
         int i = 1;
         for (int res : STEP_TITLES) {
             StepEntity stepEntity = new StepEntity(i, HardwareTestApplication.getContext().
@@ -79,7 +80,7 @@ public class RadioTask extends BaseManualTestTask {
                     } else if (mTestStep == STEP_OPEN) {
                         mTestStep = STEP_OPEN_FAIL;
                         mSync.notify();
-                    }else if (mTestStep == SETP_SEARCH){
+                    } else if (mTestStep == SETP_SEARCH) {
                         mTestStep = SETP_SEARCH_FINISH;
                         mSync.notify();
                     }
@@ -103,15 +104,11 @@ public class RadioTask extends BaseManualTestTask {
     @Override
     protected void startTest() {
         mTestStep = STEP_OPEN;
-        if (!stepEntities.isEmpty()) {
-            stepEntities.clear();
-        }
-        addStepEntity();
     }
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        int operateState ;
+        int operateState;
         ((RadioPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             LogTools.p(TAG, "mTestStep:" + mTestStep);
@@ -178,7 +175,7 @@ public class RadioTask extends BaseManualTestTask {
                             mExecuteState = STATE_TEST_UNPASS;
                             break;
                         }
-                        mSync.wait(40*1000);
+                        mSync.wait(40 * 1000);
                         if (mTestStep == SETP_SEARCH) {
                             mExecuteState = STATE_TEST_UNPASS;
                             LogTools.p(TAG, "收音机搜索失败，超时");

@@ -28,4 +28,229 @@
     <string name="lable_pass">Pass</string>
     <string name="label_un_pass">Didn\'t  pass</string>
     <string name="label_test_finish">test finish you can test again</string>
+
+    <string name="label_test_fail">Test failed, please check the details or re-test, test the item separately </string>
+        
+    <string name="label_bt_test_success_hint">Bluetooth test passed, please manually test Bluetooth connection, pairing, Bluetooth phone to ensure normal function </string>
+
+        
+    <string name="label_rgb_test_waite_hint">Please pay attention to the screen, and the screen will be tested later.</string>
+        
+        
+    <string name="label_manual_test_finish"> test is completed, please choose whether to pass or not according to the actual situation </string>
+
+        
+    <string name="label_test_un_pass_btn_hint">If you choose not to pass, you will go to the next test later. After all the tests are finished, you can retest the item</string>
+        
+    <string name="label_test_pass_btn_hint">You have chosen to pass, and then go to the next test. After all the tests are finished, you can retest the item</string>
+
+        
+    <string name="label_test_screen_adjust_wait_hint">The screen will be calibrated later, please follow the prompts </string>
+
+        
+    <string name="label_test_screen_brightness_wait_hint">The screen brightness test will be performed later, please observe the screen brightness change </string>
+
+        
+    <string name="label_test_screen_bringhtness_l_hint">low brightness</string>
+        
+    <string name="label_test_screen_bringhtness_m_hint">中亮</string>
+        
+    <string name="label_test_screen_bringhtness_h_hint">high brightness</string>
+
+        
+    <string name="label_test_radio_hint">The radio test will be done later, please note if the radio station changes when playing the radio </string>
+        
+    <string name="label_test_radio_open_hint">Testing the radio to turn on...</string>
+        
+    <string name="label_test_radio_search_hint">Testing radio search...</string>
+        
+    <string name="label_test_radio_play_hint">Playing station %1$.1f</string>
+        
+    <string name="label_test_radio_close_hint"> testing the radio off...</string>
+        
+    <string name="label_test_radio_search_none_hint">No stations were found, please insert the signal transmitter and try again</string>
+
+        
+    <string name="label_test_sound_effect_hint">The sound test will be done later, please note whether the sound changes.</string>
+        
+    <string name="label_test_sound_effect_play_none">No sound playback</string>
+        
+    <string name="label_test_sound_effect_play">with sound playback</string>
+
+        
+    <string name="lable_left_front_btn">left front </string>
+        
+    <string name="lable_left_rear_btn">left rear </string>
+        
+    <string name="lable_right_front_btn">right front </string>
+        
+    <string name="lable_right_rear_btn">right right </string>
+        
+    <string name="label_test_sound_amplifier_hint">Click on the four-way amplifier and watch the </string>
+        
+    <string name="label_left_front_hint">Please pay attention to whether the left front amplifier has sound </string>
+        
+    <string name="label_left_rear_hint">Please pay attention to whether the left rear amplifier has sound </string>
+        
+    <string name="label_right_front_hint">Please pay attention to whether the right front amplifier has sound </string>
+        
+    <string name="label_right_rear_hint">Please pay attention to whether the right rear amplifier has sound </string>
+        
+    <string name="label_amplifier_finish_hint">After clicking the four-way amplifier, follow the prompts </string>
+
+        
+    <string name="label_test_key_wait_hint">The button test will be performed later, please follow the prompts, the error operation is regarded as not passing </string>
+        
+    <string name="lable_test_key_home_hint">Please press the Home button </string>
+        
+    <string name="lable_test_key_up_hint">Please press the up arrow </string>
+        
+    <string name="lable_test_key_down_hint">Please press the down arrow </string>
+        
+    <string name="lable_test_key_enter_hint">Please press the OK button </string>
+        
+    <string name="lable_test_key_back_hint">Please press the back key </string>
+        
+    <string name="lable_test_key_error_hint">\n (error %1$d times) </string>
+
+        
+    <string name="label_test_knob_wait_hint">The knob will be tested later. Please follow the prompts. The error operation is considered as not passing </string>
+        
+    <string name="label_test_knob_counterclockwise_hint">Please press the knob counterclockwise </string>
+        
+    <string name="label_test_knob_clockwise_hint">Please operate the knob clockwise </string>
+
+        
+    <string name="label_test_video_wait_hint">The video surveillance test will be performed later. Please pay attention to see if there is a preview image. The preview time is 5 seconds</string>
+        
+    <string name="label_test_aux_hint">AUX test will be done later, please insert AUX</string>
+        
+    <string name="label_manual_test_aux_finish">Detected that AUX has been inserted, please choose whether to pass or not according to the actual situation </string>
+        
+    <string name="label_test_rear_view_hint">The rear view test will be performed later, please note whether there is a reverse image </string>
+        
+    <string name="label_rear_start">start rear view </string>
+        
+    <string name="label_rear_stop">stop rear view </string>
+        
+    <string name="label_test_detail_title_hint">All test items</string>
+        
+    <string name="label_manual_test_detail_result_hint"> test results: </string>
+        
+    <string name="label_manual_test_detail_success_hint">All test items are tested and the result of manual intervention is test pass</string>
+        
+    <string name="label_manual_test_detail_fail_hint">All test items are tested, and the result of manual intervention is that the test does not pass </string>
+    <string name="label_auto_test_detail_success_hint">All test items are tested and passed </string>
+    <string name="label_auto_test_detail_fail_hint">All test items are tested and the test fails.</string>
+    <string name="label_bt_open">Open Bluetooth</string>
+    <string name="label_bt_reset">Reset Bluetooth</string>
+    <string name="label_bt_close">turn off Bluetooth</string>
+    <string name="label_bt_reopen">Re-open Bluetooth</string>
+        
+    <string name="label_bt_discovery">Scan Bluetooth</string>
+        
+    <string name="label_bt_stop_discovery">Stop scanning Bluetooth</string>
+        
+    <string name="label_aux_plug">AUX insertion detection </string>
+        
+    <string name="label_gps_locate">GPS positioning</string>
+        
+    <string name="label_gps_check">detect gps open </string>
+        
+    <string name="label_key_up">Up arrow</string>
+        
+    <string name="label_key_down">down arrow </string>
+        
+    <string name="label_key_enter">OK key </string>
+        
+    <string name="label_key_back">back key </string>
+        
+    <string name="label_knob_counterclockwise">knob counterclockwise</string>
+        
+    <string name="label_knob_clockwise">knob clockwise </string>
+
+        
+    <string name="label_radio_reset">radio reset</string>
+        
+    <string name="label_radio_open">radio on</string>
+        
+    <string name="label_radio_search">Radio Search</string>
+        
+    <string name="label_radio_play">radio play</string>
+        
+    <string name="label_radio_close">radio off</string>
+        
+    <string name="label_rgb_r">red </string>
+        
+    <string name="label_rgb_g">green</string>
+        
+    <string name="label_rgb_b">blue</string>
+        
+    <string name="label_adjust_left_top">50 pixels in the upper left corner of the screen</string>
+        
+    <string name="label_adjust_right_top">50 pixels in the upper right corner of the screen</string>
+    <string name="label_adjust_left_bottom">50 pixels in the lower left corner of the screen</string>
+        
+    <string name="label_adjust_right_bottom">50 pixels in the lower right corner of the screen</string>
+        
+    <string name="label_adjust_center">the center of the screen</string>
+        
+    <string name="label_serial_version">Serial communication to get the recorder version </string>
+        
+    <string name="label_storage_path">detect path </string>
+        
+    <string name="label_storage_read">detect reading the contents of the file </string>
+        
+    <string name="label_video_preview">Detect camera preview</string>
+
+        
+    <string name="label_wifi_open">Open WIFI</string>
+        
+    <string name="label_wifi_reset">Reset WIFI</string>
+        
+    <string name="label_wifi_close">Close WIFI</string>
+        
+    <string name="label_wifi_reopen">Reopen WIFI</string>
+        
+    <string name="label_wifi_discovery">scanning hotspots</string>
+        
+    <string name="label_wifi_connect">Connection hotspot</string>
+        
+    <string name="label_wifi_request">network request </string>
+
+        
+    <string name="label_fan_turn_on">Send open fan command </string>
+        
+    <string name="label_fan_turn_off">Send close fan command </string>
+        
+    <string name="label_fan_turn_on_btn">turn on the fan</string>
+        
+    <string name="label_fan_turn_off_btn">turn off the fan</string>
+        
+    <string name="label_test_fan_hint">Testing the fan, click the Open/Close button and watch if the fan is working properly</string>
+        
+    <string name="label_fan_turn_on_hint">Open the fan, please observe whether the fan is working properly</string>
+        
+    <string name="label_fan_turn_off_hint"> Turn off the fan, please observe whether the fan is properly closed </string>
+        
+    <string name="label_fan_notify_test_hint">Fan test is completed, please follow the prompts later </string>
+
+        
+    <string name="label_gps_start_locate">Start positioning</string>
+        
+    <string name="label_gps_stop_locate">End of positioning</string>
+        
+    <string name="label_emperature">temperature detection </string>
+
+        
+    <string name="label_start_task">Start </string>
+        
+    <string name="label_stop_task">End </string>
+        
+    <string name="label_ok_btn">OK</string>
+        
+    <string name="label_cancel_btn">Cancel </string>
+        
+    <string name="label_task_executing_hint">Test task is in progress\nDo you confirm that you are logged out now? </string>
+    <string name="label_exit">Exiting...</string>
 </resources>

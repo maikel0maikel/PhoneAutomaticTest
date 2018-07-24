@@ -3,7 +3,6 @@ package com.sinohb.hardware.test.module.radio;
 import com.sinohb.hardware.test.app.BaseDisplayViewView;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
-import com.sinohb.hardware.test.task.BaseTestTask;
 
 public class RadioController extends BaseDisplayViewController implements RadioPresenter.Controller, RadioManagerable.RadioListener {
     private RadioManagerable radioManager;
@@ -69,10 +68,5 @@ public class RadioController extends BaseDisplayViewController implements RadioP
         if (task != null) {
             ((RadioTask) task).notifyRadioFreq(freq);
         }
-    }
-
-    @Override
-    public BaseTestTask getTask() {
-        return task;
     }
 }

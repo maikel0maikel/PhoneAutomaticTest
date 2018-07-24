@@ -19,7 +19,7 @@ public interface WifiPresenter {
 
         int startScan();
 
-        int connectWifi();
+        int connectWifi(String ssid,String pwd);
 
     }
 

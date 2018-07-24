@@ -60,4 +60,8 @@ public class TemperatureController extends BaseExecuteController implements Temp
         }
     }
 
+//    @Override
+//    public BaseTestTask getTask() {
+//        return task;
+//    }
 }

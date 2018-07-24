@@ -8,5 +8,5 @@ public interface WifiManagerable {
 
     int startScan();
 
-    int connectWifi();
+    int connectWifi(String ssid,String pwd);
 }

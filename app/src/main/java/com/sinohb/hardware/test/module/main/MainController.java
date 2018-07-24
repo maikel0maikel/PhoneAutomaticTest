@@ -4,6 +4,7 @@ package com.sinohb.hardware.test.module.main;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 
+import com.sinohb.hardware.test.HardwareTestApplication;
 import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.app.BaseFragment;
 import com.sinohb.hardware.test.app.activity.MainActivity;
@@ -26,18 +27,29 @@ import com.sinohb.hardware.test.app.fragment.TemperatureFragment;
 import com.sinohb.hardware.test.app.fragment.USBFragment;
 import com.sinohb.hardware.test.app.fragment.VideoMonitorFragment;
 import com.sinohb.hardware.test.app.fragment.WifiFragment;
+import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.constant.ConvertUtils;
 import com.sinohb.hardware.test.constant.SerialConstants;
 import com.sinohb.hardware.test.entities.SerialCommand;
+import com.sinohb.hardware.test.entities.StepEntity;
 import com.sinohb.hardware.test.entities.TestItem;
 import com.sinohb.hardware.test.module.frc.RFCFactory;
 import com.sinohb.hardware.test.module.frc.RFCSendListener;
 import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.hardware.test.task.ThreadPool;
 import com.sinohb.logger.LogTools;
+import com.sinohb.logger.constant.ZoneOffset;
+import com.sinohb.logger.utils.FileUtils;
+import com.sinohb.logger.utils.IOUtils;
+import com.sinohb.logger.utils.LogUtils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 
@@ -74,6 +86,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
     private int manualExecuteSize = 0;
     private int completeSize = 0;
     private boolean isExit = false;
+    private static final String DIR_PATH = "testLog";
 
     public MainController(MainPresenter.View view) {
         mView = view;
@@ -130,6 +143,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
 
     @Override
     public void destroy() {
+        stopTask();
         ThreadPool.getPool().destroy();
     }
 
@@ -138,9 +152,6 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
         FragmentManager fragmentManager = mView.getFramentManager();
         for (int i = 0; i < ICONS.length; i++) {
             TestItem testItem = new TestItem(TITLES[i], ICONS[i]);
-//            if (i == 0) {
-//                testItem.setSelect(true);
-//            }
             BaseFragment fragment;
             if (savedInstanceState != null) {
                 fragment = (BaseFragment) fragmentManager.findFragmentByTag("TAG" + i);
@@ -198,14 +209,13 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
                 if (mView != null) {
                     mView.notifyStartBtn();
                 }
-
             }
         }
         if (completeSize == tasks.size()) {
             transcatResult();
         }
         if (isTaskComplete() && isExit && mView != null) {
-            mView.destroyView();
+            saveLog();
             isExit = false;
         }
     }
@@ -215,87 +225,52 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
             LogTools.p(TAG, "transcatResult tasks is null or isEmpty");
             return;
         }
-        Collections.sort(tasks);
         StringBuilder builder = new StringBuilder();
         builder.append("{\"CommandArray\": [");
         StringBuilder result = new StringBuilder();
-        String [] arraySrc = {"","","",""};
+        String[] arraySrc = {"", "", "", ""};
         int count = 32;
         byte[] array = new byte[count];
         for (BaseTestTask task : tasks) {
             array[task.getmTaskId()] = (byte) task.isPass();
         }
+        LogTools.p(TAG, "array:" + Arrays.toString(array));
         int k = 0;
-        for (int i = 8; i < count; i +=8 ) {
-            for (int j=i-1;j>=0;j--){
+        for (int i = 8 - 1; i < count; i += 8) {
+            for (int j = i; j >= k * 8; j--) {
                 result.append(array[j]);
-                if (i == j+8){
-                    arraySrc[k++] = result.toString();
-                    result.delete(0,result.length());
-                }
+            }
+            if (k < array.length) {
+                arraySrc[k++] = result.toString();
+                result.delete(0, result.length());
             }
         }
-
-
-//        int j;
-//        for (int i = 0; i < count; i++) {
-//            if (i < 8) {
-//                byte1 = getByteSrc(result, byte1, i, 7 - i, 7);
-//            } else if (i < 16) {
-//                byte2 = getByteSrc(result, byte2, i, 15 - i + 8, 15);
-//            } else if (i < 24) {
-//                byte3 = getByteSrc(result, byte3, i, 23 - i + 16, 23);
-//            } else {
-//                j = 31 - i + 24;
-//                if (j < tasks.size()) {
-//                    BaseTestTask task = tasks.get(j);
-//                    result.append(task.isPass());
-//                } else {
-//                    result.append(0);
-//                }
-//            }
-//        }
-//        byte4 = result.toString();
         result.setLength(0);
-        LogTools.p(TAG, "byte1:" + arraySrc[0] + ",byte2:" + arraySrc[1]  + ",byte3:" +  arraySrc[2]  + ",byte4:" +  arraySrc[3] );
-        byte transcat1 = ConvertUtils.bitToByte(arraySrc[0]);
-        byte transcat2 = ConvertUtils.bitToByte(arraySrc[1] );
-        byte transcat3 = ConvertUtils.bitToByte(arraySrc[2]);
-        byte transcat4 = ConvertUtils.bitToByte(arraySrc[3]);
-        builder.append("\"0x").append(Integer.toHexString(transcat1)).append("\",\"0x").
-                append(Integer.toHexString(transcat2)).append("\",\"0x").
-                append(Integer.toHexString(transcat3)).append("\",\"0x").append(Integer.toHexString(transcat4)).append("\"]}");
-        LogTools.p(TAG, "transcat1:" + transcat1 + ",transcat2:" + transcat2 + ",transcat3:" + transcat3 + ",transcat4:" + transcat4);
-//        int size = tasks.size() - 1;
-//        for (int i = 0; i < size; i++) {
-//            BaseTestTask task = tasks.get(i);
-//            builder.append("\"").append(task.getmTaskId()).append("\"").append(",");
-//            result.append("\"").append(task.isPass()).append("\"").append(",");
-//        }
-//        builder.append("\"").append(tasks.get(size).getmTaskId()).append("\"").append(",");
-//        result.append("\"").append(tasks.get(size).isPass()).append("\"").append("]}");
-//        builder.append(result);
+//        byte transcat1 = ConvertUtils.bitToByte(arraySrc[0]);
+//        byte transcat2 = ConvertUtils.bitToByte(arraySrc[1]);
+//        byte transcat3 = ConvertUtils.bitToByte(arraySrc[2]);
+//        byte transcat4 = ConvertUtils.bitToByte(arraySrc[3]);
+//        builder.append("\"0x").append(Integer.toHexString(transcat4 & 0xFF)).append("\",\"0x").
+//                append(Integer.toHexString(transcat3 & 0xFF)).append("\",\"0x").
+//                append(Integer.toHexString(transcat2 & 0xFF)).append("\",\"0x").append(Integer.toHexString(transcat1 & 0xFF)).append("\"]}");
+//        LogTools.p(TAG, "transcat1:" + transcat1 + ",transcat2:" + transcat2 + ",transcat3:" + transcat3 + ",transcat4:" + transcat4);
+//        String data = builder.toString();
+//        LogTools.p(TAG, "transcatResult builder:" + data);
+        for (int i = arraySrc.length-1;i>=0;i--){
+            byte transcatByte = ConvertUtils.bitToByte(arraySrc[i]);
+            builder.append("\"0x").append(Integer.toHexString(transcatByte & 0xFF));
+            if (i==0){
+               builder.append("\"]}");
+            }else {
+                builder.append("\",");
+            }
+        }
         String data = builder.toString();
         LogTools.p(TAG, "transcatResult builder:" + data);
         SerialCommand c = new SerialCommand(SerialConstants.SERIAL_TRANSACT_TEST_RESULTS_NO, SerialConstants.ID_TEST_RESULTS, data, this);
         RFCFactory.getInstance().sendMsg(c);
     }
 
-    private String getByteSrc(StringBuilder result, String byte1, int i, int i2, int i3) {
-        int j;
-        j = i2;
-        if (j < tasks.size()) {
-            BaseTestTask task = tasks.get(j);
-            result.append(task.isPass());
-        } else {
-            result.append(0);
-        }
-        if (i == i3) {
-            byte1 = result.toString();
-            result.delete(0, result.length());
-        }
-        return byte1;
-    }
 
     @Override
     public boolean isTaskComplete() {
@@ -321,6 +296,62 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
     public void exit() {
         isExit = true;
         stopTask();
+    }
+
+    @Override
+    public void saveLog() {
+        ThreadPool.getPool().executeSingleTask(new Runnable() {
+            @Override
+            public void run() {
+                realSaveLog();
+            }
+        });
+    }
+
+    private void realSaveLog() {
+        String dirPath = LogUtils.genDirPath(DIR_PATH);
+        String fileName = LogUtils.genFileName("", 24, ZoneOffset.P0800);
+        String filePath = dirPath + File.separator + fileName;
+        FileOutputStream fos = null;
+        OutputStreamWriter osw = null;
+        BufferedWriter writer = null;
+        if (FileUtils.createDir(dirPath)) {
+            try {
+                File file = new File(filePath);
+                fos = new FileOutputStream(file, false);
+                osw = new OutputStreamWriter(fos, Charset.forName("UTF-8"));
+                writer = new BufferedWriter(osw);
+                List<StepEntity> stepEntities;
+                StringBuilder builder = new StringBuilder();
+                int k = 0;
+                for (BaseTestTask task : tasks) {
+                    stepEntities = task.getStepEntities();
+                    int i = 1;
+                    builder.append( HardwareTestApplication.getContext().getResources().getString(TITLES[k])).append(":\r\n");
+                    for (StepEntity entity : stepEntities) {
+                        String pass = entity.getTestState() == Constants.TestItemState.STATE_SUCCESS ?
+                                HardwareTestApplication.getContext().getResources().getString(R.string.lable_pass) :
+                                HardwareTestApplication.getContext().getResources().getString(R.string.label_un_pass);
+                        builder.append("\t").append(i).append(".").append(entity.getStepTitle()).append("(").append(pass).append(")").append("\r\n");
+                        i++;
+                    }
+                    builder.append("\r\n");
+                    k++;
+                }
+                writer.write(builder.toString());
+                writer.flush();
+                builder.setLength(0);
+            } catch (Exception e) {
+                LogTools.p("SaveFileTask", e, "error");
+            } finally {
+                IOUtils.closeQuietly(fos);
+                IOUtils.closeQuietly(osw);
+                IOUtils.closeQuietly(writer);
+            }
+        }
+        if (mView!=null){
+            mView.destroyView();
+        }
     }
 
 
@@ -358,10 +389,6 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
         }
         ThreadPool.getPool().executeOrderTask(manualRunnables);
         ThreadPool.getPool().execute(autoRunnables);
-
-//        if (mView != null) {
-//            mView.notifyStopBtn();
-//        }
     }
 
     private void stopTask() {

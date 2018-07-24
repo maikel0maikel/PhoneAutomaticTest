@@ -47,6 +47,7 @@ public class MediapayerTester implements IMediaplayer {
             }
             mMediaPlayer.release();
             mMediaPlayer = null;
+            LogTools.p(TAG,"mMediaPlayer destroy");
             return Constants.DEVICE_SUPPORTED;
         }
         LogTools.p(TAG, "mMediaPlayer 为null");

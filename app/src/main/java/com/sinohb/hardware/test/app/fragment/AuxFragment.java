@@ -1,6 +1,8 @@
 package com.sinohb.hardware.test.app.fragment;
 
 
+import android.view.View;
+
 import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.app.BaseFragment;
 import com.sinohb.hardware.test.app.BaseManualFragment;
@@ -41,6 +43,7 @@ public class AuxFragment extends BaseManualFragment implements AuxPresenter.View
             setOperateHintText(R.string.label_test_aux_hint);
             //test_state_stub.setVisibility(View.GONE);
         }else if (state == BaseTestTask.STATE_TEST_WAIT_OPERATE){
+            setStubVisibility(test_state_stub, View.GONE);
             setOperateHintText(R.string.label_manual_test_aux_finish);
         }
     }

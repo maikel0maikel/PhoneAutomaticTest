@@ -155,4 +155,5 @@
     <string name="label_ok_btn">确定</string>
     <string name="label_cancel_btn">取消</string>
     <string name="label_task_executing_hint">测试任务正在进行\n您是否确认现在退出？</string>
+    <string name="label_exit">正在退出...</string>
 </resources>

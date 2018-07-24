@@ -144,7 +144,7 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
             transaction.add(R.id.content, fragment, "TAG" + index);
         }
 
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
         defaultPosition = index;
         currentFragment = fragment;
         LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -386,7 +386,10 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
             case R.id.layout_back:
                 if (mPresenter != null && mPresenter.hasTaskExecuting()) {
                     showDialog();
-                } else {
+                } else if (mPresenter!=null){
+                    showProgressDialog();
+                    mPresenter.saveLog();
+                }else {
                     finish();
                 }
                 break;

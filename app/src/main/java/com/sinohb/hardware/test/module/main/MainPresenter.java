@@ -56,6 +56,8 @@ public interface MainPresenter {
         boolean hasTaskExecuting();
 
         void exit();
+
+        void saveLog();
     }
 
 }

@@ -11,14 +11,37 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
+    signingConfigs {
+        release {
+            keyAlias 'huabao'
+            keyPassword 'marsir'
+            storeFile file('../doc/huabao.jks')
+            storePassword 'marsir'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                // 输出apk名称为ForWatch_v1.1(2)_2016-09-28_15-54-35.apk
+                def version = "${versionName}"
+                def fileName = "SystemUpgrade-${version}-${getTime()}.apk"
+                //output.outputFile = new File(outputFile.parent, fileName)
+                outputFileName = fileName
+            }
         }
     }
 }
-
+def getTime() {
+    return new Date().format("yyyyMMdd", TimeZone.getDefault());
+}
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:23.2.1'

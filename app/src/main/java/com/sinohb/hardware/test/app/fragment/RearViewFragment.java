@@ -1,5 +1,7 @@
 package com.sinohb.hardware.test.app.fragment;
 
+import android.view.View;
+
 import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.app.BaseManualFragment;
 import com.sinohb.hardware.test.module.rearview.RearViewController;
@@ -26,6 +28,7 @@ public class RearViewFragment extends BaseManualFragment implements RearViewPres
     protected void freshUi(int state) {
         super.freshUi(state);
         if (state == BaseTestTask.STATE_NONE) {
+            setStubVisibility(operate_hint_stub, View.VISIBLE);
             setOperateHintText(R.string.label_test_rear_view_hint);
         }
     }

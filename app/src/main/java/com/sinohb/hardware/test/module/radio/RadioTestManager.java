@@ -3,6 +3,7 @@ package com.sinohb.hardware.test.module.radio;
 
 import com.marsir.radio.RadioExListener;
 import com.marsir.radio.RadioExManager;
+import com.marsir.radio.RadioExParam;
 import com.sinohb.hardware.test.HardwareTestApplication;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.logger.LogTools;
@@ -17,6 +18,9 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
         radioExManager = (RadioExManager) HardwareTestApplication.getContext().getSystemService("radioex");
         if (isEnable()) {
             radioExManager.addRadioExListener(this);
+            RadioExParam radioExParam = radioExManager.getParameters();
+            radioExParam.fm_seek_step = 10;
+            radioExManager.setParam(radioExParam);
         }
     }
 
