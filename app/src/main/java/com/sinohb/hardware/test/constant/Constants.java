@@ -91,7 +91,7 @@ public class Constants {
         public static final int MSG_RADIO_SEARCH = 138;
         public static final int MSG_RADIO_OPENED_HINT = 139;
         public static final int MSG_RADIO_SEARCH_NONE = 140;
-
+        public static final int MSG_RADIO_SEARCH_STOP = 141;
         /**
          * effect
          */

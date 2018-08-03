@@ -119,6 +119,7 @@ public class BaseFragment extends Fragment implements View.OnClickListener {
                 }
                 break;
             case BaseTestTask.STATE_TEST_WAIT_OPERATE:
+                inflateOperateHintView();
                 inflateManualStub();
                 setOperateHintText(R.string.label_manual_test_finish);
                 setStubVisibility(retry_stub, View.GONE);

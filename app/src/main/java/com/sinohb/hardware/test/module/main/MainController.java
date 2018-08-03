@@ -91,6 +91,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
     public MainController(MainPresenter.View view) {
         mView = view;
         mView.setPresenter(this);
+        RFCFactory.getInstance().connectService();
     }
 
 
@@ -143,8 +144,24 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
 
     @Override
     public void destroy() {
+        RFCFactory.getInstance().disconnectService();
         stopTask();
         ThreadPool.getPool().destroy();
+        fragments = null;
+        clearList(manualTasks);
+        manualTasks = null;
+        clearList(autoTasks);
+        autoTasks = null;
+        clearList(tasks);
+        tasks = null;
+        clearList(testItems);
+        testItems = null;
+    }
+
+    void clearList(List list) {
+        if (list != null) {
+            list.clear();
+        }
     }
 
     @Override
@@ -211,12 +228,12 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
                 }
             }
         }
-        if (completeSize == tasks.size()) {
+        if (isTaskComplete()) {
             transcatResult();
-        }
-        if (isTaskComplete() && isExit && mView != null) {
-            saveLog();
-            isExit = false;
+            if (isExit) {
+                saveLog();
+                isExit = false;
+            }
         }
     }
 
@@ -256,12 +273,12 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
 //        LogTools.p(TAG, "transcat1:" + transcat1 + ",transcat2:" + transcat2 + ",transcat3:" + transcat3 + ",transcat4:" + transcat4);
 //        String data = builder.toString();
 //        LogTools.p(TAG, "transcatResult builder:" + data);
-        for (int i = arraySrc.length-1;i>=0;i--){
+        for (int i = arraySrc.length - 1; i >= 0; i--) {
             byte transcatByte = ConvertUtils.bitToByte(arraySrc[i]);
             builder.append("\"0x").append(Integer.toHexString(transcatByte & 0xFF));
-            if (i==0){
-               builder.append("\"]}");
-            }else {
+            if (i == 0) {
+                builder.append("\"]}");
+            } else {
                 builder.append("\",");
             }
         }
@@ -274,7 +291,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
 
     @Override
     public boolean isTaskComplete() {
-        return (tasks != null) && (completeSize == tasks.size());
+        return (tasks != null) && !tasks.isEmpty() && (completeSize == tasks.size());
     }
 
     @Override
@@ -296,6 +313,9 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
     public void exit() {
         isExit = true;
         stopTask();
+        if (isTaskComplete()) {
+            saveLog();
+        }
     }
 
     @Override
@@ -327,7 +347,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
                 for (BaseTestTask task : tasks) {
                     stepEntities = task.getStepEntities();
                     int i = 1;
-                    builder.append( HardwareTestApplication.getContext().getResources().getString(TITLES[k])).append(":\r\n");
+                    builder.append(HardwareTestApplication.getContext().getResources().getString(TITLES[k])).append(":\r\n");
                     for (StepEntity entity : stepEntities) {
                         String pass = entity.getTestState() == Constants.TestItemState.STATE_SUCCESS ?
                                 HardwareTestApplication.getContext().getResources().getString(R.string.lable_pass) :
@@ -349,7 +369,13 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
                 IOUtils.closeQuietly(writer);
             }
         }
-        if (mView!=null){
+        for (BaseFragment fragment : fragments) {
+            if (fragment.getPresenter() != null) {
+                fragment.getPresenter().destroy();
+            }
+        }
+        Arrays.fill(fragments, 0, fragments.length, null);
+        if (mView != null) {
             mView.destroyView();
         }
     }
@@ -409,7 +435,7 @@ public class MainController implements MainPresenter.Controller, RFCSendListener
     }
 
     @Override
-    public void onSuccess(int NO, int id) {
+    public void onSuccess(int NO, int id, String data) {
 
     }
 

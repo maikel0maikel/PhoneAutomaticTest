@@ -27,7 +27,7 @@ public class RearViewFragment extends BaseManualFragment implements RearViewPres
     @Override
     protected void freshUi(int state) {
         super.freshUi(state);
-        if (state == BaseTestTask.STATE_NONE) {
+        if (state == BaseTestTask.STATE_NONE||state == BaseTestTask.STATE_RUNNING) {
             setStubVisibility(operate_hint_stub, View.VISIBLE);
             setOperateHintText(R.string.label_test_rear_view_hint);
         }

@@ -35,6 +35,11 @@ public class ScreenAdjustActivity extends Activity implements ScreenAdjustPresen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (mPresenter!=null){
+            mPresenter.destroy();
+            mPresenter = null;
+        }
+
     }
 
     @Override
@@ -73,6 +78,11 @@ public class ScreenAdjustActivity extends Activity implements ScreenAdjustPresen
         }
         setResult(RESULT_OK,intent);
         finish();
+    }
+
+    @Override
+    public void destroy() {
+
     }
 
     @Override

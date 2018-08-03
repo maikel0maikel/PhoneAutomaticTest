@@ -75,7 +75,17 @@ public class KeyFragment extends BaseManualFragment implements KeyPresenter.View
         }
     }
 
-    protected void displayHintView(int keyCode,int errorCode) {
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (mHandler!=null){
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_KEY_PRESEE_KEYCODE);
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        mHandler = null;
+    }
+
+    protected void displayHintView(int keyCode, int errorCode) {
         int resId = 0;
         switch (keyCode) {
             case Constants.HandlerMsg.MSG_KEY_PRESS_HOME:
@@ -141,4 +151,5 @@ public class KeyFragment extends BaseManualFragment implements KeyPresenter.View
             mainActivity.removeKeyListener(this);
         }
     }
+
 }

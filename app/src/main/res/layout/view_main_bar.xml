@@ -28,6 +28,8 @@
         android:paddingLeft="10dp"
         android:text="@string/label_main_bar_title"
         android:textColor="@color/white_color"
+        android:singleLine="true"
+        android:maxLength="10"
         android:textSize="@dimen/x25" />
 
     <TextView
@@ -38,7 +40,14 @@
         android:layout_toRightOf="@id/bar_title_tv"
         android:paddingLeft="@dimen/x17"
         android:textColor="@color/white_color"
-        android:textSize="@dimen/x25" />
+        android:textSize="@dimen/x25"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:scrollHorizontally="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:layout_toLeftOf="@+id/layout_icons"/>
 
     <TextClock
         android:id="@+id/time_tv"
@@ -64,11 +73,11 @@
 
 
     <LinearLayout
+        android:id="@+id/layout_icons"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/time_tv"
-        android:layout_toRightOf="@id/version_tv"
         android:gravity="right|center_vertical"
         android:paddingRight="@dimen/x17">
 

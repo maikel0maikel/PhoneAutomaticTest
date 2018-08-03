@@ -156,4 +156,16 @@ public class FanFragment extends BaseManualFragment implements FanPresenter.View
             }
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (mHandler!=null){
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_FAN_TURN_ON);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_FAN_TURN_OFF);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_FAN_NOTIFY_TEST);
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        mHandler = null;
+    }
 }

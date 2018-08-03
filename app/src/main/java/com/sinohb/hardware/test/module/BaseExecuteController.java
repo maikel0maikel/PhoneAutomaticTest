@@ -14,7 +14,7 @@ public abstract class BaseExecuteController extends BaseController implements Ba
     @Override
     public void notifyExecuteState(int executeState) {
         if (mView != null) {
-            ((BaseExecuteView)mView).freshExecuteUI(executeState);
+            ((BaseExecuteView)mView ).freshExecuteUI(executeState);
         }
     }
 

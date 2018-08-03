@@ -26,13 +26,15 @@ public interface BluetoothPresenter {
 
         void bound();
 
-        void connect();
+        int connect(String mac);
 
         void disconnect();
 
         void sendMessage(byte[] message);
 
         void sendMessage(String message);
+
+        void notifyConnected();
     }
 
 }

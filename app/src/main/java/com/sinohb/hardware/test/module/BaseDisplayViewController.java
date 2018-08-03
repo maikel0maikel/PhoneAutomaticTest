@@ -10,21 +10,21 @@ public abstract class BaseDisplayViewController extends BaseExecuteController im
 
     @Override
     public void displayView() {
-        if (mView!=null){
-            ((BaseDisplayViewView)mView).displayView();
+        if (mView != null) {
+            ((BaseDisplayViewView) mView).displayView();
         }
     }
 
     @Override
     public void testOk() {
-        if (task!=null){
+        if (task != null) {
             task.testOk();
         }
     }
 
     @Override
     public void testFail() {
-        if (task!=null){
+        if (task != null) {
             task.testFail();
         }
     }

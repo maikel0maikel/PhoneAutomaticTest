@@ -25,7 +25,7 @@ public class VideoTestTask extends BaseManualTestTask{
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        ((BaseDisplayViewPresenter)mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((BaseDisplayViewPresenter)mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         LogTools.p(TAG, "视频监控任务进行中");
         synchronized (mSync){
             mSync.wait();
@@ -59,6 +59,6 @@ public class VideoTestTask extends BaseManualTestTask{
     @Override
     protected void startTest() {
         super.startTest();
-        ((BaseDisplayViewPresenter)mPresenter).notifyExecuteState(STATE_NONE);
+        ((BaseDisplayViewPresenter)mPresenter.get()).notifyExecuteState(STATE_NONE);
     }
 }

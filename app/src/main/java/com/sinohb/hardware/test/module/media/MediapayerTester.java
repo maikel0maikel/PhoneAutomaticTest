@@ -28,6 +28,7 @@ public class MediapayerTester implements IMediaplayer {
         if (mMediaPlayer != null) {
             mMediaPlayer.setLooping(true);
             mMediaPlayer.start();
+
             return Constants.DEVICE_SUPPORTED;
         }
         LogTools.p(TAG, "mMediaPlayer 为null");
@@ -38,6 +39,19 @@ public class MediapayerTester implements IMediaplayer {
     public boolean isPlaying() {
         return mMediaPlayer != null && mMediaPlayer.isPlaying();
     }
+
+    @Override
+    public int stop() {
+        if (mMediaPlayer != null) {
+            if (mMediaPlayer.isPlaying()){
+                mMediaPlayer.pause();
+            }
+            return Constants.DEVICE_SUPPORTED;
+        }
+        LogTools.p(TAG, "mMediaPlayer 为null");
+        return Constants.DEVICE_NOT_SUPPORT;
+    }
+
 
     @Override
     public int destroy() {

@@ -1,16 +1,14 @@
 package com.sinohb.hardware.test.app.fragment;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.view.View;
 
 import com.sinohb.hardware.test.R;
-import com.sinohb.hardware.test.app.BaseAutomaticFragment;
+import com.sinohb.hardware.test.app.BaseManualFragment;
 import com.sinohb.hardware.test.module.bluetooth.BluetoothController;
 import com.sinohb.hardware.test.module.bluetooth.BluetoothPresenter;
 import com.sinohb.hardware.test.task.BaseTestTask;
-import com.sinohb.logger.LogTools;
 
-public class BluetoothFragment extends BaseAutomaticFragment implements BluetoothPresenter.View {
+public class BluetoothFragment extends BaseManualFragment implements BluetoothPresenter.View {
 
     @Override
     protected void init() {
@@ -20,17 +18,14 @@ public class BluetoothFragment extends BaseAutomaticFragment implements Bluetoot
             new BluetoothController(this);
         }
     }
+
     public static BluetoothFragment newInstance() {
 
         return new BluetoothFragment();
     }
-    public BluetoothFragment(){
+
+    public BluetoothFragment() {
         init();
-    }
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        LogTools.p(TAG,"onCreate");
     }
 
 
@@ -54,15 +49,14 @@ public class BluetoothFragment extends BaseAutomaticFragment implements Bluetoot
     @Override
     protected void freshUi(int state) {
         super.freshUi(state);
-        if (state == BaseTestTask.STATE_FINISH) {
+        if (state == BaseTestTask.STATE_TEST_WAIT_OPERATE) {
+            setStubVisibility(operate_hint_stub,View.VISIBLE);
             setOperateHintText(R.string.label_bt_test_success_hint);
+            setStubVisibility(test_state_stub, View.GONE);
+        }else if (state == BaseTestTask.STATE_FINISH){
+
         }
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        LogTools.p(TAG,"onDestroyView");
-    }
 
 }

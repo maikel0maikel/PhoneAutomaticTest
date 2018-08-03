@@ -10,4 +10,6 @@ public interface IWifiSubject {
     void notifyConnectedState(int connectedState);
 
     void notifyScanFinished();
+
+    void destroy();
 }

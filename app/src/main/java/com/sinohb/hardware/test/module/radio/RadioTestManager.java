@@ -13,6 +13,7 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
     private RadioExManager radioExManager;
     private static final int DEFAULT_FREQ = 8750;
     private RadioListener listener;
+
     RadioTestManager(RadioListener listener) {
         this.listener = listener;
         radioExManager = (RadioExManager) HardwareTestApplication.getContext().getSystemService("radioex");
@@ -51,12 +52,22 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
     }
 
     @Override
-    public int search() {
+    public int search(int type) {
         if (isEnable()) {
             if (!isOpen()) {
                 return Constants.DEVICE_STATE_ERROR;
             }
-            radioExManager.setSearch(RadioExManager.SEARCH_AUTO);
+            switch (type) {
+                case AUTO:
+                    radioExManager.setSearch(RadioExManager.SEARCH_AUTO);
+                    break;
+                case FORWARD:
+                    radioExManager.setSearch(RadioExManager.SEARCH_DOWN);
+                    break;
+                case BACKWARD:
+                    radioExManager.setSearch(RadioExManager.SEARCH_UP);
+                    break;
+            }
             return Constants.DEVICE_SUPPORTED;
         }
         return Constants.DEVICE_NOT_SUPPORT;
@@ -65,15 +76,20 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
     @Override
     public int closeRadio() {
         if (isEnable()) {
+            LogTools.p(TAG, "closeRadio radioExManager.getState() :" + radioExManager.getState());
             if (isOpen()) {
                 radioExManager.powerOff();
-                LogTools.p(TAG, "closeRadio radioExManager.getState() :" + radioExManager.getState());
                 return Constants.DEVICE_SUPPORTED;
-            }else {
+            } else {
                 return Constants.DEVICE_NORMAL;
             }
         }
         return Constants.DEVICE_NOT_SUPPORT;
+    }
+
+    @Override
+    public int getCurrentFreq() {
+        return radioExManager == null ? 0 : radioExManager.getFreq();
     }
 
     @Override
@@ -83,9 +99,10 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
 
     @Override
     public void destroy() {
-        if (isEnable()){
+        if (isEnable()) {
             radioExManager.removeRadioExListener(this);
         }
+        listener = null;
     }
 
     private boolean isEnable() {
@@ -96,7 +113,7 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
     public void onStateChanged(int i, int i1) {
         int state = radioExManager.getState();
         LogTools.p(TAG, "onStateChanged " + i + ",i1:" + i1 + ",state:" + state);
-        if (listener!=null){
+        if (listener != null) {
             listener.notifyRadioState(state);
         }
     }
@@ -113,8 +130,8 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
 
     @Override
     public void onSeekFreqEvent(int i, int i1) {
-        LogTools.p(TAG, "onSeekFreqEvent i=" + i );
-        if (listener!=null){
+        LogTools.p(TAG, "onSeekFreqEvent i=" + i);
+        if (listener != null) {
             listener.notifyRadioFreq(i);
         }
     }
@@ -124,7 +141,6 @@ public class RadioTestManager implements RadioManagerable, RadioExListener {
     public void onSensitivityChanged(int i) {
 
     }
-
 
 
 }

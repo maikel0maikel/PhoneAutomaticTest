@@ -18,13 +18,6 @@ public class BaseManualFragment extends BaseFragment implements BaseDisplayViewV
         mHandler = new ManualHandler(this);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mHandler!=null){
-            mHandler.removeCallbacksAndMessages(null);
-        }
-    }
 
     @Override
     public void freshExecuteUI(int executeState) {
@@ -46,6 +39,18 @@ public class BaseManualFragment extends BaseFragment implements BaseDisplayViewV
         if (mainActivity != null) {
             mainActivity.notifyItemTaskFinish(task,testType);
         }
+    }
+
+    @Override
+    public void destroy() {
+        if (mHandler!=null){
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_BASE_MANUAL_EXCECUTE_STATE);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_BASE_MANUAL_DISPLAY_VIEW);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_BASE_MANUAL_COMPLETE_VIEW);
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        mPresenter = null;
+        LogTools.p(this.getClass().getSimpleName(),"BaseManualFragment onDestroy");
     }
 
     @Override

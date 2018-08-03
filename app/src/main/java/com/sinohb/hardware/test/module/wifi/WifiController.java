@@ -12,7 +12,6 @@ import com.sinohb.hardware.test.module.BaseExecuteController;
 import com.sinohb.hardware.test.module.wifi.receiver.WifiEventReceiver;
 import com.sinohb.hardware.test.module.wifi.subject.WifiObserver;
 import com.sinohb.hardware.test.module.wifi.subject.WifiSubjectManager;
-import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.logger.LogTools;
 
 
@@ -106,6 +105,7 @@ public class WifiController extends BaseExecuteController implements WifiPresent
             mReceiver = null;
         }
         WifiSubjectManager.getInstance().detachObserver(this);
+        WifiSubjectManager.getInstance().destroy();
         super.destroy();
     }
 

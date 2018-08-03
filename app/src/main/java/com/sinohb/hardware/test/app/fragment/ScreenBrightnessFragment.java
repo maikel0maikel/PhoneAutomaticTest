@@ -58,6 +58,9 @@ public class ScreenBrightnessFragment extends BaseManualFragment /** implements 
             setStubVisibility(operate_hint_stub, View.GONE);
             inflateManualStub();
             setBtnEnable(true);
+        }else if (state == BaseTestTask.STATE_TEST_WAIT_OPERATE){
+            setStubVisibility(operate_hint_stub, View.GONE);
+            setStubVisibility(manual_stub, View.GONE);
         }
     }
 

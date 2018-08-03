@@ -10,14 +10,19 @@ import com.sinohb.hardware.test.app.BaseDisplayViewView;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.logger.LogTools;
 
-public abstract class RFCController extends BaseDisplayViewController implements RFCSendListener {
+public abstract class RFCController extends BaseDisplayViewController /**implements RFCSendListener*&*/ {
     protected RFCDataReceiver receiver;
-
+    protected int mNo = -1;
     public RFCController(BaseDisplayViewView view) {
         super(view);
         registReceiver();
     }
 
+    @Override
+    public void start() {
+        super.start();
+        mNo = -1;
+    }
 
 //    @Override
 //    public void start() {
@@ -62,7 +67,8 @@ public abstract class RFCController extends BaseDisplayViewController implements
                 String msg = intent.getStringExtra("msg");
                 int msgId = intent.getIntExtra("msgId", -1);
                 int serialNo = intent.getIntExtra("serialNo", -1);
-                receiverData(serialNo,msgId,msg,RFCController.this);
+                //receiverData(serialNo,msgId,msg,RFCController.this);
+                LogTools.p(TAG,"msgId:"+msgId+",msg:"+msg);
             }
         }
     }

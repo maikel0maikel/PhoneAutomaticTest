@@ -9,4 +9,5 @@ public interface IBluetoothSubject {
     void notifyDeviceFound(String name,String address);
     void notifyScanStarted();
     void notifyScanFinished();
+    void destroy();
 }

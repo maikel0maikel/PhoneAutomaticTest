@@ -7,7 +7,6 @@ import android.provider.Settings;
 import com.sinohb.hardware.test.HardwareTestApplication;
 import com.sinohb.hardware.test.app.BaseDisplayViewView;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
-import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.logger.LogTools;
 
 

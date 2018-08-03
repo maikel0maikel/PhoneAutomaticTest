@@ -4,31 +4,38 @@ import com.sinohb.hardware.test.entities.SerialCommand;
 
 public class RFCFactory {
     private IRFCServer server;
+    private static RFCFactory INSTANCE;
 
-    private RFCFactory(){server = new RFCServerImpl();}
-
-    public static RFCFactory getInstance(){
-
-        return INSTANCE.INSTANCE;
+    private RFCFactory() {
+        server = new RFCServerImpl();
     }
 
-    private static final class INSTANCE{
-        private static RFCFactory INSTANCE = new RFCFactory();
+    public static RFCFactory getInstance() {
+        if (INSTANCE == null) {
+            synchronized (RFCFactory.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new RFCFactory();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
-    public void connectService(){
+
+    public void connectService() {
         server.connectService();
     }
 
-    public void sendMsg(SerialCommand c){
+    public void sendMsg(SerialCommand c) {
         server.sendMsg(c);
     }
 
-    public  void disconnectService(){
+    public void disconnectService() {
         server.disconnectService();
+        INSTANCE = null;
     }
 
-    public  boolean isConnected(){
+    public boolean isConnected() {
         return server.isConnected();
     }
 }

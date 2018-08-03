@@ -11,7 +11,6 @@ import com.sinohb.hardware.test.HardwareTestApplication;
 import com.sinohb.hardware.test.app.BaseExecuteView;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.module.BaseExecuteController;
-import com.sinohb.hardware.test.task.BaseTestTask;
 import com.sinohb.logger.LogTools;
 
 
@@ -64,7 +63,7 @@ public class GPSController extends BaseExecuteController implements GPSPresenter
         boolean enable = gpsManager != null && gpsManager.isGPSEnable();
         if (mView != null) {
             if (enable) {
-                ((GPSPresenter.View) mView).notifyGPSState(1);
+                ((GPSPresenter.View) mView ).notifyGPSState(1);
             } else {
                 ((GPSPresenter.View) mView).notifyGPSState(0);
             }

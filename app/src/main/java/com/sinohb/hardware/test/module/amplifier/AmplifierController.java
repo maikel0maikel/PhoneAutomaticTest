@@ -45,7 +45,7 @@ public class AmplifierController extends BaseDisplayViewController implements Am
     @Override
     public void notifyTestAll() {
         if (mView != null) {
-            ((AmplifierPresenter.View) mView).notifyTestAll();
+            ((AmplifierPresenter.View) mView ).notifyTestAll();
         }
     }
 
@@ -59,6 +59,14 @@ public class AmplifierController extends BaseDisplayViewController implements Am
     @Override
     public void complete() {
         super.complete();
+        if (managerable != null) {
+            managerable.stop();
+        }
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
         if (managerable != null) {
             managerable.destroy();
         }

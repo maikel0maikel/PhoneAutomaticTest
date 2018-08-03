@@ -5,7 +5,6 @@ import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.hardware.test.module.audoex.EffectManagerable;
 import com.sinohb.hardware.test.module.audoex.EffectTestManager;
-import com.sinohb.hardware.test.task.BaseTestTask;
 
 public class EffectController extends BaseDisplayViewController implements EffectPresenter.Controller {
     private EffectManagerable effectManagerable;
@@ -21,20 +20,23 @@ public class EffectController extends BaseDisplayViewController implements Effec
         effectManagerable = new EffectTestManager();
     }
 
-    @Override
-    public int playNormal() {
-        if (mView != null) {
-            ((EffectPresenter.View) mView).notifyPlayNormal();
-        }
-        return effectManagerable == null ? Constants.DEVICE_NOT_SUPPORT : effectManagerable.playNormal();
-    }
+//    @Override
+//    public int playNormal() {
+//        if (mView != null) {
+//            ((EffectPresenter.View) mView).notifyPlayNormal();
+//        }
+//        return effectManagerable == null ? Constants.DEVICE_NOT_SUPPORT : effectManagerable.playNormal();
+//    }
 
     @Override
-    public int playEffect() {
-        if (mView != null) {
-            ((EffectPresenter.View) mView).notifyPlayEffect();
+    public int playEffect(int effect) {
+//        if (mView != null) {
+//            ((EffectPresenter.View) mView).notifyPlayEffect();
+//        }
+        if (task!=null){
+            ((EffectTask)task).notifyPlayEffect(effect);
         }
-        return effectManagerable == null ? Constants.DEVICE_NOT_SUPPORT : effectManagerable.playEffect();
+        return effectManagerable == null ? Constants.DEVICE_NOT_SUPPORT : effectManagerable.playEffect(effect);
     }
 
     @Override
@@ -45,8 +47,17 @@ public class EffectController extends BaseDisplayViewController implements Effec
     @Override
     public void complete() {
         super.complete();
-        effectManagerable.destroy();
+        if (effectManagerable != null)
+            effectManagerable.stop();
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (effectManagerable != null)
+            effectManagerable.destroy();
+    }
+
     //    @Override
 //    public BaseTestTask getTask() {
 //        return null;

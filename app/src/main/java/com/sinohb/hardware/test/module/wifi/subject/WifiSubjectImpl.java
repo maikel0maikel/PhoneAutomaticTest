@@ -5,7 +5,9 @@ import java.util.List;
 
 public class WifiSubjectImpl implements IWifiSubject {
     private List<WifiObserver> observers = new ArrayList<>();
-    protected WifiSubjectImpl(){}
+
+    protected WifiSubjectImpl() {
+    }
 
     @Override
     public void attchObserver(WifiObserver observer) {
@@ -19,7 +21,7 @@ public class WifiSubjectImpl implements IWifiSubject {
 
     @Override
     public void notifyOpenState(int openedState) {
-        for (WifiObserver observer:observers){
+        for (WifiObserver observer : observers) {
             observer.notifyOpenState(openedState);
         }
     }
@@ -27,7 +29,7 @@ public class WifiSubjectImpl implements IWifiSubject {
 
     @Override
     public void notifyConnectedState(int connectedState) {
-        for (WifiObserver observer:observers){
+        for (WifiObserver observer : observers) {
             observer.notifyConnectedState(connectedState);
         }
     }
@@ -35,8 +37,16 @@ public class WifiSubjectImpl implements IWifiSubject {
 
     @Override
     public void notifyScanFinished() {
-        for (WifiObserver observer:observers){
+        for (WifiObserver observer : observers) {
             observer.notifyScanFinished();
+        }
+    }
+
+    @Override
+    public void destroy() {
+        if (observers != null) {
+            observers.clear();
+            observers = null;
         }
     }
 }

@@ -34,7 +34,7 @@ public class ScreenTask extends BaseTestTask {
 
     @Override
     public Integer call() throws Exception {
-        ScreenPresenter.Controller controller = (ScreenPresenter.Controller) mPresenter;
+        ScreenPresenter.Controller controller = (ScreenPresenter.Controller) mPresenter.get();
         while (!isFinish) {
             LogTools.p(TAG, "屏幕测试开始");
             switch (mExecuteState) {

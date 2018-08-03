@@ -1,7 +1,6 @@
 package com.sinohb.hardware.test.module.audoex;
 
 
-
 import com.marsir.audio.AudioExManager;
 import com.marsir.common.CommonManager;
 import com.sinohb.hardware.test.HardwareTestApplication;
@@ -15,10 +14,9 @@ import com.sinohb.hardware.test.module.volume.VolumeManager;
 public class EffectTestManager implements EffectManagerable {
     private static final String TAG = "EffectTestManager";
     private AudioExManager audioExManager;
-    private static final int CLOSE_EFFECT = 0;
-    private static final int OPPEN_POP_EFFECT = 4;
     private IMediaplayer mediaplayer;
     private CommonManager mCommonManager;
+
     public EffectTestManager() {
         audioExManager = (AudioExManager) HardwareTestApplication.getContext().getSystemService("audioex");
         VolumeAdjustManagerable managerable = new VolumeManager();
@@ -28,23 +26,23 @@ public class EffectTestManager implements EffectManagerable {
     }
 
 
-    @Override
-    public int playNormal() {
-        if (isEnable()) {
-            setEffect(CLOSE_EFFECT);
-            if (!mediaplayer.isPlaying()) {
-                mediaplayer.play();
-            }
-            return Constants.DEVICE_SUPPORTED;
-        }
-        return Constants.DEVICE_NOT_SUPPORT;
-    }
+//    @Override
+//    public int playNormal() {
+//        if (isEnable()) {
+//            setEffect(CLOSE_EFFECT);
+//            if (!mediaplayer.isPlaying()) {
+//                mediaplayer.play();
+//            }
+//            return Constants.DEVICE_SUPPORTED;
+//        }
+//        return Constants.DEVICE_NOT_SUPPORT;
+//    }
 
 
     @Override
-    public int playEffect() {
+    public int playEffect(int effect) {
         if (isEnable()) {
-            setEffect(OPPEN_POP_EFFECT);
+            setEffect(effect);
             if (!mediaplayer.isPlaying()) {
                 mediaplayer.play();
             }
@@ -56,7 +54,8 @@ public class EffectTestManager implements EffectManagerable {
     @Override
     public int closeEffect() {
         if (isEnable()) {
-            destroy();
+            setEffect(EQ_MODE_NORMAL);
+            mediaplayer.stop();
             return Constants.DEVICE_SUPPORTED;
         }
         return Constants.DEVICE_NOT_SUPPORT;
@@ -64,7 +63,7 @@ public class EffectTestManager implements EffectManagerable {
 
     @Override
     public int playAmplifier(AmplifierEntity entity) {
-        if (entity == null){
+        if (entity == null) {
             return Constants.DEVICE_NOT_SUPPORT;
         }
         if (isEnable()) {
@@ -72,7 +71,7 @@ public class EffectTestManager implements EffectManagerable {
                 mediaplayer.play();
             }
             audioExManager.setGold(entity.w, entity.h);
-            if (mCommonManager!=null){
+            if (mCommonManager != null) {
                 mCommonManager.saveSystemSetting();
             }
             return Constants.DEVICE_SUPPORTED;
@@ -85,7 +84,15 @@ public class EffectTestManager implements EffectManagerable {
         if (mediaplayer != null) {
             mediaplayer.destroy();
         }
-        setEffect(CLOSE_EFFECT);
+        setEffect(EQ_MODE_NORMAL);
+    }
+
+    @Override
+    public int stop() {
+        if (isEnable()) {
+            return mediaplayer.stop();
+        }
+        return Constants.DEVICE_NOT_SUPPORT;
     }
 
     private boolean isEnable() {

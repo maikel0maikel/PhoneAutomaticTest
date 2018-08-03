@@ -69,7 +69,7 @@ public class BrightnessTask extends BaseManualTestTask {
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        ((BrightnessPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((BrightnessPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
 //            executeStep((BrightnessPresenter.Controller) mPresenter);
 //            Thread.sleep(3000);

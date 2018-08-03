@@ -16,14 +16,24 @@ import com.sinohb.logger.LogTools;
  * 蓝牙管理类
  * 实现打开、关闭、连接、绑定等功能
  */
-public class BLEManager implements BluetoothManagerable, BtearListener,BtearScanListener {
+public class BLEManager implements BluetoothManagerable /**, BtearListener,BtearScanListener**/
+{
     private BtearManager mDeviceBluetoothManager;
     private static final String TAG = "BluetoothTestManager";
+    private MyBtearListener mBtearListener;
+    private MyBtearScanListener mBtearScanListener;
 
     BLEManager() {
         mDeviceBluetoothManager = (BtearManager) HardwareTestApplication.getContext().getSystemService(BluetoothConstants.BTEAR_SERVICE);
-        mDeviceBluetoothManager.addBtearListener(this);
-        mDeviceBluetoothManager.addBtearScanListener(this);
+        if (mDeviceBluetoothManager != null) {
+            if (mBtearScanListener == null)
+                mBtearScanListener = new MyBtearScanListener();
+            if (mBtearListener == null)
+                mBtearListener = new MyBtearListener();
+            mDeviceBluetoothManager.addBtearListener(mBtearListener);
+            mDeviceBluetoothManager.addBtearScanListener(mBtearScanListener);
+
+        }
     }
 
     @Override
@@ -33,7 +43,7 @@ public class BLEManager implements BluetoothManagerable, BtearListener,BtearScan
             return Constants.DEVICE_NOT_SUPPORT;
         }
         if (!isEnable()) {
-            LogTools.p(TAG,"call open method");
+            LogTools.p(TAG, "call open method");
             mDeviceBluetoothManager.powerOn();
         } else {
             return Constants.DEVICE_RESET;
@@ -48,7 +58,7 @@ public class BLEManager implements BluetoothManagerable, BtearListener,BtearScan
             return Constants.DEVICE_NOT_SUPPORT;
         }
         if (isEnable()) {
-            LogTools.p(TAG,"call close method");
+            LogTools.p(TAG, "call close method");
             mDeviceBluetoothManager.powerOff();
         } else {
             //BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
@@ -73,7 +83,8 @@ public class BLEManager implements BluetoothManagerable, BtearListener,BtearScan
 
     private boolean isEnable() {
 
-        return mDeviceBluetoothManager.getPowerState() == BtearManager.POWER_STATE_ENABLED;
+        return !(mDeviceBluetoothManager.getPowerState() == BtearManager.POWER_STATE_DISABLED
+                || mDeviceBluetoothManager.getPowerState() == BtearManager.POWER_STATE_DISABLING);
     }
 
     @Override
@@ -96,54 +107,85 @@ public class BLEManager implements BluetoothManagerable, BtearListener,BtearScan
             LogTools.e(TAG, "该设备不支持蓝牙[ method --->connect ]");
             return Constants.DEVICE_NOT_SUPPORT;
         }
-          mDeviceBluetoothManager.linkTo(btAddress);
+        if (btAddress == null || btAddress.length() == 0) {
+            LogTools.e(TAG, "btAddress is empty!!");
+            return BluetoothConstants.ConnectState.STATE_DISCONNECTED;
+        }
+        if (mDeviceBluetoothManager.getPowerState() == BtearManager.POWER_STATE_LINKED){
+            LogTools.p(TAG,"connect device is already connected");
+            return Constants.DEVICE_CONNECTED;
+        }
+        mDeviceBluetoothManager.linkTo(btAddress);
         return Constants.DEVICE_SUPPORTED;
     }
 
-
     @Override
-    public void onPowerStateChanged(int btState) {
-        LogTools.p(TAG, "onPowerStateChanged:" + btState);
-        switch (btState){
-            case BtearManager.POWER_STATE_ENABLING:
-                BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNING_ON);
-                break;
-            case BtearManager.POWER_STATE_ENABLED:
-                BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_ON);
-                break;
-            case BtearManager.POWER_STATE_DISABLING:
-                BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNING_OFF);
-                break;
-            case BtearManager.POWER_STATE_DISABLED:
-                BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
-                break;
+    public void destroy() {
+        if (mDeviceBluetoothManager != null) {
+            if (mBtearScanListener != null) {
+                mDeviceBluetoothManager.removeBtearScanListener(mBtearScanListener);
+                mBtearScanListener = null;
+            }
+            if (mBtearListener != null) {
+                mDeviceBluetoothManager.removeBtearListener(mBtearListener);
+                mBtearListener = null;
+            }
         }
     }
 
-    @Override
-    public void onCallStateChanged(int i) {
-        LogTools.p(TAG,"onCallStateChanged method call i:"+i);
+
+    static class MyBtearListener implements BtearListener {
+
+        @Override
+        public void onPowerStateChanged(int btState) {
+            LogTools.p(TAG, "onPowerStateChanged:" + btState);
+            switch (btState) {
+                case BtearManager.POWER_STATE_ENABLING:
+                    BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNING_ON);
+                    break;
+                case BtearManager.POWER_STATE_ENABLED:
+                    BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_ON);
+                    break;
+                case BtearManager.POWER_STATE_DISABLING:
+                    BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNING_OFF);
+                    break;
+                case BtearManager.POWER_STATE_DISABLED:
+                    BluetoothSubjectManager.getInstance().notifyOpenState(BluetoothConstants.OpenState.STATE_TURNED_OFF);
+                    break;
+                case BtearManager.POWER_STATE_LINKED:
+                    BluetoothSubjectManager.getInstance().notifyConnectedState(BluetoothConstants.ConnectState.STATE_CONNECTED);
+                    break;
+            }
+        }
+
+        @Override
+        public void onCallStateChanged(int i) {
+            LogTools.p(TAG, "onCallStateChanged method call i:" + i);
+        }
+
+        @Override
+        public void onMediaStateChanged(int i) {
+            LogTools.p(TAG, "onMediaStateChanged method call i:" + i);
+        }
+
+        @Override
+        public void onParamChanged(BtearParam btearParam, int i) {
+            LogTools.p(TAG, "onParamChanged method call i:" + i + ",btearParam:" + btearParam);
+        }
     }
 
-    @Override
-    public void onMediaStateChanged(int i) {
-        LogTools.p(TAG,"onMediaStateChanged method call i:"+i);
-    }
+    static class MyBtearScanListener implements BtearScanListener {
 
-    @Override
-    public void onParamChanged(BtearParam btearParam, int i) {
-        LogTools.p(TAG,"onParamChanged method call i:"+i+",btearParam:"+btearParam);
-    }
+        @Override
+        public void onScanDeviceEvent(String name, String mac) {
+            BluetoothSubjectManager.getInstance().notifyScanStarted();
+            BluetoothSubjectManager.getInstance().notifyDeviceFound(name, mac);
+        }
 
-    @Override
-    public void onScanDeviceEvent(String s, String s1) {
-        LogTools.p(TAG,"s:"+s+",s1:"+s1);
-        BluetoothSubjectManager.getInstance().notifyScanStarted();
-    }
-
-    @Override
-    public void onScanFinish() {
-        LogTools.p(TAG,"onScanFinish method call");
-        BluetoothSubjectManager.getInstance().notifyScanFinished();
+        @Override
+        public void onScanFinish() {
+            LogTools.p(TAG, "onScanFinish method call");
+            BluetoothSubjectManager.getInstance().notifyScanFinished();
+        }
     }
 }

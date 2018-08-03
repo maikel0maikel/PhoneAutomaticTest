@@ -16,6 +16,8 @@ public class GPSTestTask extends BaseAutoTestTask {
     private static final int STEP_LOCATE_SUCCESS = 4;
     private static final int STEP_STOP_LOCATE = 5;
 
+    private int openCount = 0;
+
     public GPSTestTask(BasePresenter presenter) {
         super(presenter);
         mTaskId = SerialConstants.ITEM_GPS;
@@ -34,38 +36,48 @@ public class GPSTestTask extends BaseAutoTestTask {
     protected void executeRunningState() throws InterruptedException {
         boolean isChange = false;
         while (mExecuteState == STATE_RUNNING) {
-            switch (mTestStep){
+            switch (mTestStep) {
                 case STEP_CHECK:
-                    boolean isGPSOpen = ((GPSPresenter.Controller) mPresenter).isEnable();
-                    if (isGPSOpen){
+                    boolean isGPSOpen = ((GPSPresenter.Controller) mPresenter.get()).isEnable();
+                    if (isGPSOpen) {
                         mTestStep = STEP_LOCATE;
                         LogTools.p(TAG, "gps 已经打开----");
                         isChange = notifyGpsState(isChange, isGPSOpen, 1);
                         stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
-                    }else {
+                    } else {
                         isChange = notifyGpsState(isChange, isGPSOpen, 0);
                         Thread.sleep(1000);
+                        openCount++;
+                        if (openCount >= 60) {
+                            mExecuteState = STATE_TEST_UNPASS;
+                            openCount = 0;
+                            LogTools.p(TAG,"打开超时");
+                        }
                     }
                     break;
                 case STEP_LOCATE:
-                    LogTools.p(TAG,"gps开始定位");
+                    LogTools.p(TAG, "gps开始定位");
                     synchronized (mSync) {
-                        ((GPSPresenter.Controller) mPresenter).startLocateInMain();
-                        mSync.wait();
+                        ((GPSPresenter.Controller) mPresenter.get()).startLocateInMain();
+                        mSync.wait(60 * 1000);
+                    }
+                    if (mTestStep == STEP_LOCATE) {
+                        mTestStep = STEP_LOCATE_FAIL;
+                        LogTools.e(TAG, "定位超时60s");
                     }
                     break;
                 case STEP_LOCATE_SUCCESS:
-                    LogTools.p(TAG,"gps定位成功");
+                    LogTools.p(TAG, "gps定位成功");
                     mTestStep = STEP_STOP_LOCATE;
                     stepEntities.get(1).setTestState(Constants.TestItemState.STATE_SUCCESS);
                     break;
                 case STEP_STOP_LOCATE:
-                    LogTools.p(TAG,"gps停止定位");
-                    ((GPSPresenter.Controller) mPresenter).stopLocateInMain();
+                    LogTools.p(TAG, "gps停止定位");
+                    ((GPSPresenter.Controller) mPresenter.get()).stopLocateInMain();
                     mExecuteState = STATE_FINISH;
                     break;
                 case STEP_LOCATE_FAIL:
-                    LogTools.p(TAG,"gps定位失败");
+                    LogTools.p(TAG, "gps定位失败");
                     stepEntities.get(1).setTestState(Constants.TestItemState.STATE_FAIL);
                     mExecuteState = STATE_TEST_UNPASS;
                     break;
@@ -76,19 +88,20 @@ public class GPSTestTask extends BaseAutoTestTask {
     private boolean notifyGpsState(boolean isChange, boolean isGPSOpen, int i) {
         if (isChange != isGPSOpen) {
             isChange = isGPSOpen;
-            ((GPSPresenter.Controller) mPresenter).notifyGPSState(i);
+            ((GPSPresenter.Controller) mPresenter.get()).notifyGPSState(i);
         }
         return isChange;
     }
 
-    public void notifyLocateSuccess(){
-        synchronized (mSync){
+    public void notifyLocateSuccess() {
+        synchronized (mSync) {
             mTestStep = STEP_LOCATE_SUCCESS;
             mSync.notify();
         }
     }
-    public void notifyLocateFail(){
-        synchronized (mSync){
+
+    public void notifyLocateFail() {
+        synchronized (mSync) {
             mTestStep = STEP_LOCATE_FAIL;
             mSync.notify();
         }
@@ -98,5 +111,6 @@ public class GPSTestTask extends BaseAutoTestTask {
     protected void startTest() {
         super.startTest();
         mTestStep = STEP_CHECK;
+        openCount = 0;
     }
 }

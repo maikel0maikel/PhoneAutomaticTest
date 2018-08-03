@@ -44,7 +44,7 @@ public class AmplifierTask extends BaseManualTestTask {
     @Override
     protected void executeRunningState() throws InterruptedException {
         LogTools.p(TAG, "功放测试任务进行中");
-        ((AmplifierPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((AmplifierPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         int count = 0;
         for (int i : arrays) {
             if (i > 0) {
@@ -53,13 +53,13 @@ public class AmplifierTask extends BaseManualTestTask {
         }
         if (count == 4) {
             mExecuteState = STATE_TEST_WAIT_OPERATE;
-            ((AmplifierPresenter.Controller) mPresenter).notifyTestAll();
+            ((AmplifierPresenter.Controller) mPresenter.get()).notifyTestAll();
         } else {
             synchronized (mSync) {
                 mSync.wait();
             }
             Thread.sleep(100);
-            ((AmplifierPresenter.Controller) mPresenter).notifyAmplifierPosition(mHitPosition);
+            ((AmplifierPresenter.Controller) mPresenter.get()).notifyAmplifierPosition(mHitPosition);
         }
     }
 

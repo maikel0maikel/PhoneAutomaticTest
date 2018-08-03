@@ -13,7 +13,6 @@ import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.logger.LogTools;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class RGBController extends BaseDisplayViewController {

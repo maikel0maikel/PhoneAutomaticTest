@@ -11,7 +11,7 @@ public class RGBTask extends BaseManualTestTask {
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        ((BaseDisplayViewPresenter) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((BaseDisplayViewPresenter) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
                 mSync.wait();

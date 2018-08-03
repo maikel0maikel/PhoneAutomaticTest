@@ -49,7 +49,7 @@ public class KeyTestTask extends BaseManualTestTask {
             errorCount = 0;
             keyErrorCount++;
             try {
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -117,41 +117,41 @@ public class KeyTestTask extends BaseManualTestTask {
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        ((KeyPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((KeyPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
                 switch (mTestStep) {
                     case STEP_PRESS_KEY_HOME:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_HOME, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_HOME, errorCount);
                         LogTools.p(TAG, "菜单键测试");
                         if (breakCondition(SETP_PRESS_KEY_UP)) break;
                         mSync.wait();
                         break;
                     case SETP_PRESS_KEY_UP:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_UP, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_UP, errorCount);
                         LogTools.p(TAG, "向上键测试");
                         if (breakCondition(SETP_PRESS_KEY_DOWN)) break;
                         mSync.wait();
                         break;
                     case SETP_PRESS_KEY_DOWN:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_DOWN, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_DOWN, errorCount);
                         LogTools.p(TAG, "向下键测试");
                         if (breakCondition(SETP_PRESS_KEY_ENTER)) break;
                         mSync.wait();
                         break;
                     case SETP_PRESS_KEY_ENTER:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_ENTER, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_ENTER, errorCount);
                         LogTools.p(TAG, "确定键测试");
                         if (breakCondition(SETP_PRESS_KEY_BACK)) break;
                         mSync.wait();
                         break;
                     case SETP_PRESS_KEY_BACK:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_BACK, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KEY_PRESS_BACK, errorCount);
                         LogTools.p(TAG, "返回键测试");
                         if (breakCondition(STEP_KEY_FINISH)) break;
                         mSync.wait();

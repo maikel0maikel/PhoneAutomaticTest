@@ -99,6 +99,11 @@ public class BluetoothTestManager implements BluetoothManagerable {
         return  Constants.DEVICE_SUPPORTED;
     }
 
+    @Override
+    public void destroy() {
+
+    }
+
     private void createBond(BluetoothDevice device) {
         Class clz = BluetoothDevice.class;
         try {

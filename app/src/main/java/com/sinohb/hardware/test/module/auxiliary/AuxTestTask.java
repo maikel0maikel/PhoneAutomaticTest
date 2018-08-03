@@ -10,6 +10,7 @@ import com.sinohb.hardware.test.task.BaseManualTestTask;
 import com.sinohb.logger.LogTools;
 
 public class AuxTestTask extends BaseManualTestTask {
+    private int waiteCount = 0;
     public AuxTestTask(BasePresenter presenter) {
         super(presenter);
         mTaskId = SerialConstants.ITEM_AUX;
@@ -25,16 +26,23 @@ public class AuxTestTask extends BaseManualTestTask {
     @Override
     protected void executeRunningState() throws InterruptedException {
         int auxState;
-        ((AuxPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((AuxPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
-                auxState = ((AuxController) mPresenter).getAuxStatus();
+                auxState = ((AuxController) mPresenter.get()).getAuxStatus();
                 if (auxState == 1) {
-                    ((AuxPresenter.Controller) mPresenter).notifyAuxStatus(auxState);
+                    ((AuxPresenter.Controller) mPresenter.get()).notifyAuxStatus(auxState);
                     stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
                     mExecuteState = STATE_TEST_WAIT_OPERATE;
+                    waiteCount = 0;
                 } else {
                     mSync.wait(1000);
+                    waiteCount++;
+                    if (waiteCount>=60){
+                        mExecuteState = STATE_TEST_UNPASS;
+                        waiteCount = 0;
+                        LogTools.p(TAG,"aux 1分钟没有检测到插入不通过");
+                    }
                 }
             }
         }
@@ -45,6 +53,7 @@ public class AuxTestTask extends BaseManualTestTask {
             LogTools.p(TAG,"notifyAuxInsert mExecuteState:"+mExecuteState);
             return;
         }
+        stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
         mExecuteState = STATE_TEST_WAIT_OPERATE;
     }
 

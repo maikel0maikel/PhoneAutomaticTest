@@ -3,20 +3,42 @@ package com.sinohb.hardware.test.module.serial;
 import com.sinohb.hardware.test.app.BaseDisplayViewView;
 import com.sinohb.hardware.test.constant.SerialConstants;
 import com.sinohb.hardware.test.entities.SerialCommand;
-import com.sinohb.hardware.test.module.frc.RFCController;
+import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.hardware.test.module.frc.RFCFactory;
-import com.sinohb.hardware.test.module.frc.RFCSendListener;
 import com.sinohb.logger.LogTools;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class SerialController extends RFCController implements SerialPresenter.Controller {
+
+public class SerialController extends BaseDisplayViewController implements SerialPresenter.Controller {
     private static final String TAG = SerialController.class.getSimpleName();
+
+    @Override
+    protected void onSuccess(int NO, int id, String data) {
+        LogTools.p(TAG, "onSuccess id:" + id);
+        if (id == 0x8601) {
+            notifyResult(data);
+            if (task != null) {
+                ((SerialTask) task).sendOk();
+            }
+        }
+        super.onSuccess(NO, id, data);
+    }
+
+    @Override
+    protected void onFailure(int NO, int id) {
+        LogTools.e(TAG, "onFailure");
+        if (task != null) {
+            ((SerialTask) task).sendFailure();
+        }
+        super.onFailure(NO, id);
+    }
 
     public SerialController(BaseDisplayViewView view) {
         super(view);
         init();
+        // sendListener = new CMDSendListener(this);
     }
 
 
@@ -25,13 +47,6 @@ public class SerialController extends RFCController implements SerialPresenter.C
         task = new SerialTask(this);
     }
 
-    @Override
-    protected void receiverData(int no, int id, String msg, RFCSendListener listener) {
-        if (listener == SerialController.this && id == 0x8601 && msg.contains("0802")) {
-            LogTools.p(TAG,"receiverData ok");
-            notifyResult(msg);
-        }
-    }
 
     @Override
     public void displayView() {
@@ -40,14 +55,14 @@ public class SerialController extends RFCController implements SerialPresenter.C
 
     @Override
     public void getVersion() {
-        SerialCommand c = new SerialCommand(SerialConstants.SERIAL_VERSION_NO, SerialConstants.ID_VERSION, "{\"CommandArray\": [\"0x0802\"]}", this);
+        SerialCommand c = new SerialCommand(SerialConstants.SERIAL_VERSION_NO, SerialConstants.ID_VERSION, "{\"CommandArray\": [\"0x0802\"]}", sendListener);
         RFCFactory.getInstance().sendMsg(c);
     }
 
     private void notifyResult(String result) {
-        if (task != null) {
-            ((SerialTask) task).notifyResult();
-        }
+//        if (task != null) {
+//            ((SerialTask) task).notifyResult();
+//        }
         try {
             JSONObject jsonObject = new JSONObject(result);
             String version = jsonObject.getString("0x0802");
@@ -60,21 +75,5 @@ public class SerialController extends RFCController implements SerialPresenter.C
         }
     }
 
-
-    @Override
-    public void onSuccess(int NO, int id) {
-        LogTools.p(TAG, "onSuccess");
-        if (task != null) {
-            ((SerialTask) task).sendOk();
-        }
-    }
-
-    @Override
-    public void onFailure(int NO, int id) {
-        LogTools.e(TAG, "onFailure");
-        if (task != null) {
-            ((SerialTask) task).sendFailure();
-        }
-    }
 
 }

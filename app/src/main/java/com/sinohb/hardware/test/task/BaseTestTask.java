@@ -6,10 +6,11 @@ import com.sinohb.hardware.test.app.BasePresenter;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.entities.StepEntity;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseTestTask> {
+public abstract class BaseTestTask implements Callable<Integer>, Comparable<BaseTestTask> {
     protected static final String TAG = BaseTestTask.class.getSimpleName();
     public static final int AUTOMATIC = 1000;
     public static final int MANUAL = 1001;
@@ -20,7 +21,7 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     public static final int STATE_STEP_FINSH = 4;
     public static final int STATE_TEST_UNPASS = 5;
     public static final int STATE_TEST_WAIT_OPERATE = 6;
-    protected static final long TASK_WAITE_TIME = 1500 * 10;//15s
+    protected static final long TASK_WAITE_TIME = 2000 * 10;//20s
     protected int mExecuteState = STATE_NONE;
     protected int mTaskId;
     protected String mTaskName;
@@ -28,7 +29,7 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     protected final Object mSync = new Object();
     protected int mTestStep = 0;
     protected int mPreStep = 0;
-    protected BasePresenter mPresenter;
+    protected WeakReference<BasePresenter> mPresenter;
     protected int isPass = 0;
 
     protected int descriptionSrc;
@@ -38,7 +39,7 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     protected ArrayList<StepEntity> stepEntities = new ArrayList<>();
 
     public BaseTestTask(BasePresenter presenter) {
-        this.mPresenter = presenter;
+        this.mPresenter = new WeakReference<>(presenter);
         initStepEntity();
     }
 
@@ -47,7 +48,7 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     }
 
     public void setmExecuteState(int mExecuteState) {
-        synchronized (mSync){
+        synchronized (mSync) {
             this.mExecuteState = mExecuteState;
             mSync.notify();
         }
@@ -79,11 +80,14 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     }
 
     public BasePresenter getPresenter() {
-        return mPresenter;
+        return mPresenter == null ? null : mPresenter.get();
     }
 
     public void setPresenter(BasePresenter presenter) {
-        this.mPresenter = presenter;
+        if (mPresenter == null) {
+            this.mPresenter = new WeakReference<>(presenter);
+        }
+
     }
 
     public void resume() {
@@ -119,12 +123,13 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
             mSync.notify();
         }
     }
+
     protected void executeRunningState() throws InterruptedException {
 
     }
 
-    protected void startTest(){
-        for (StepEntity entity:stepEntities){
+    protected void startTest() {
+        for (StepEntity entity : stepEntities) {
             entity.setTestState(Constants.TestItemState.STATE_TESTING);
         }
     }
@@ -140,7 +145,8 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
     public int getDescriptionSrc() {
         return descriptionSrc;
     }
-    protected void initStepEntity(){
+
+    protected void initStepEntity() {
 
     }
 
@@ -154,16 +160,30 @@ public abstract class BaseTestTask implements Callable<Integer>,Comparable<BaseT
 
     @Override
     public int compareTo(@NonNull BaseTestTask another) {
-        if (this.mTaskId>another.mTaskId){
+        if (this.mTaskId > another.mTaskId) {
             return 1;
-        }else if (this.mTaskId == another.mTaskId){
+        } else if (this.mTaskId == another.mTaskId) {
             return 0;
-        }else {
-            return  -1;
+        } else {
+            return -1;
         }
     }
 
-    protected void unpass(){
+    protected void unpass() {
 
+    }
+
+    public void destroy() {
+        if (stepEntities != null) {
+            for (StepEntity entity:stepEntities){
+                entity = null;
+            }
+            stepEntities.clear();
+            stepEntities = null;
+        }
+        if (mPresenter!=null){
+            mPresenter.clear();
+            mPresenter = null;
+        }
     }
 }

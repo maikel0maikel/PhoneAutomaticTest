@@ -15,11 +15,10 @@ public class ThreadPool {
     private static final String TAG = "ThreadPool";
     private static ThreadPool pool = null;
     private static final int POOL_SIZE = 5;
-    private List<Runnable> mAutoExecuteWorkerQueue = new LinkedList<>();
+    private List<Runnable> mAutoExecuteWorkerQueue;
     private Worker[] mWorkers;
-//    private QueueWorker mManualWorker;
     private Worker mManualWorker;
-    private List<Runnable> mManualWorkerQueue = new LinkedList<>();
+    private List<Runnable> mManualWorkerQueue;
     private static final int CORE_SIZE = 5;
     private static final int THREAD_SIZE = 5;
     private static final ThreadFactory TF = new ThreadFactory() {
@@ -44,6 +43,8 @@ public class ThreadPool {
     }
 
     private ThreadPool() {
+        mManualWorkerQueue = new LinkedList<>();
+        mAutoExecuteWorkerQueue = new LinkedList<>();
         mWorkers = new Worker[POOL_SIZE];
         for (int i = 0; i < POOL_SIZE; i++) {
             mWorkers[i] = new Worker(mAutoExecuteWorkerQueue);
@@ -140,17 +141,23 @@ public class ThreadPool {
             worker.stopWork();
         }
         mManualWorker.stopWork();
-        mAutoExecuteWorkerQueue.clear();
-        mManualWorkerQueue.clear();
-        if (TASK_EXECUTOR!=null){
+        if (mAutoExecuteWorkerQueue != null) {
+            mAutoExecuteWorkerQueue.clear();
+            mAutoExecuteWorkerQueue = null;
+        }
+        if (mManualWorkerQueue != null) {
+            mManualWorkerQueue.clear();
+            mManualWorkerQueue = null;
+        }
+        if (TASK_EXECUTOR != null) {
             TASK_EXECUTOR.shutdownNow();
             TASK_EXECUTOR = null;
         }
-
+        mWorkers = null;
         pool = null;
     }
 
-    private class Worker implements Runnable {
+    private static class Worker implements Runnable {
         private boolean isRun = true;
         private List<Runnable> workerQueue;
 

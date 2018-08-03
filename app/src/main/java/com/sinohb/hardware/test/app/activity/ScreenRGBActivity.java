@@ -57,6 +57,11 @@ public class ScreenRGBActivity extends Activity implements ScreenPresenter.View 
     }
 
     @Override
+    public void destroy() {
+
+    }
+
+    @Override
     public void setPresenter(ScreenPresenter.Controller presenter) {
         mPresenter = presenter;
     }

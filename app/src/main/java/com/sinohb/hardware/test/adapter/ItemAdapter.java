@@ -2,7 +2,6 @@ package com.sinohb.hardware.test.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -97,13 +96,18 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemHolder> {
 
     class MyClickListener implements View.OnClickListener {
         private int position;
+        // private WeakReference<ItemAdapter> weakReference;
 
-        MyClickListener(int position) {
+        MyClickListener(int position/**, ItemAdapter adapter**/) {
             this.position = position;
+            //weakReference = new WeakReference<>(adapter);
         }
 
         @Override
         public void onClick(View v) {
+//            if (weakReference != null && weakReference.get() != null && weakReference.get().listener != null) {
+//                weakReference.get().listener.onItemClick(weakReference.get(), position);
+//            }
             if (listener != null) {
                 listener.onItemClick(ItemAdapter.this, position);
             }

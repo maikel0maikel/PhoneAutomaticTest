@@ -22,10 +22,13 @@ import com.sinohb.hardware.test.app.KeyListener;
 import com.sinohb.hardware.test.constant.BluetoothConstants;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.constant.WifiConstants;
+import com.sinohb.hardware.test.entities.ConfigEntity;
 import com.sinohb.hardware.test.entities.TestItem;
+import com.sinohb.hardware.test.module.frc.RFCFactory;
 import com.sinohb.hardware.test.module.main.MainController;
 import com.sinohb.hardware.test.module.main.MainPresenter;
 import com.sinohb.hardware.test.task.BaseTestTask;
+import com.sinohb.hardware.test.utils.JsonUtils;
 import com.sinohb.hardware.test.widget.ExitDialog;
 import com.sinohb.hardware.test.widget.ExitProgressDialog;
 import com.sinohb.logger.LogTools;
@@ -57,6 +60,23 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
     private ExitProgressDialog progressDialog;
     private MainHandler mHandler;
 
+    static class ItemOnclickListener implements ItemAdapter.ItemOnclickListener {
+        WeakReference<MainActivity> weakReference;
+
+        ItemOnclickListener(MainActivity activity) {
+            weakReference = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void onItemClick(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter, int position) {
+            if (weakReference != null && weakReference.get() != null) {
+                weakReference.get().showFragment(position);
+            } else {
+                LogTools.e(TAG, "onItemClick weakReference is null and weakReference.get() is null");
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setBackgroundDrawable(null);
@@ -70,6 +90,7 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
             defaultPosition = savedInstanceState.getInt(SAVED_FRAGMENT_INDEX, 0);
         }
         //showFragment(defaultPosition);
+        LogTools.p(TAG,"json:"+ JsonUtils.toJson(new ConfigEntity()));
         mPresenter.start();
     }
 
@@ -80,13 +101,7 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mAdapter = new ItemAdapter(this, mPresenter.getTestItems(), new ItemAdapter.ItemOnclickListener() {
-            @Override
-            public void onItemClick(RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter, int position) {
-
-                showFragment(position);
-            }
-        });
+        mAdapter = new ItemAdapter(this, mPresenter.getTestItems(), new ItemOnclickListener(this));
         recyclerView.setAdapter(mAdapter);
 
         auxIv = (ImageView) findViewById(R.id.aux_iv);
@@ -330,9 +345,15 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
         }
         dismissDialog(dialog);
         dismissDialog(progressDialog);
-        if (mHandler!=null){
+        progressDialog = null;
+        dialog = null;
+        if (mHandler != null) {
             mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
         }
+        recyclerView.removeAllViews();
+        mAdapter = null;
+        mPresenter = null;
     }
 
     @Override
@@ -386,10 +407,10 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
             case R.id.layout_back:
                 if (mPresenter != null && mPresenter.hasTaskExecuting()) {
                     showDialog();
-                } else if (mPresenter!=null){
+                } else if (mPresenter != null) {
                     showProgressDialog();
                     mPresenter.saveLog();
-                }else {
+                } else {
                     finish();
                 }
                 break;
@@ -468,7 +489,7 @@ public class MainActivity extends FragmentActivity implements MainPresenter.View
                         activity.tfIv.setImageResource(R.mipmap.ic_tf_bar_closed);
                     }
                 case Constants.HandlerMsg.MSG_MAIN_NOTIFY_TASK_START:
-                    if (activity.mAdapter!=null){
+                    if (activity.mAdapter != null) {
                         activity.mAdapter.notifyDataSetChanged();
                     }
                     break;

@@ -43,6 +43,18 @@ public class BaseAutomaticFragment extends BaseFragment implements BaseExecuteVi
         }
     }
 
+    @Override
+    public void destroy() {
+        if (mHandler!=null){
+            mHandler.removeMessages( Constants.HandlerMsg.MSG_BASE_AUTOMIC_EXCECUTE_STATE);
+            mHandler.removeMessages( Constants.HandlerMsg.MSG_BASE_AUTOMIC_COMPLETE_VIEW);
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+        mPresenter = null;
+        LogTools.p(TAG,"BaseAuto onDestroy");
+    }
+
     protected static class BaseAutomaticHandler extends Handler {
         protected WeakReference<BaseAutomaticFragment> weakReference = null;
 
@@ -68,14 +80,6 @@ public class BaseAutomaticFragment extends BaseFragment implements BaseExecuteVi
                     fragment.retryBtn.setEnabled(true);
                 }
             }
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (mHandler!=null){
-            mHandler.removeCallbacksAndMessages(null);
         }
     }
 }

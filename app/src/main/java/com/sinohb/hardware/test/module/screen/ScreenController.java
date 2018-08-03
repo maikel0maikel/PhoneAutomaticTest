@@ -28,7 +28,7 @@ public class ScreenController extends BaseController implements ScreenPresenter.
 
     @Override
     public void start() {
-        if (task != null && (task.getmExecuteState() == BaseTestTask.STATE_NONE||task.isFinish())) {
+        if (task != null && (task.getmExecuteState() == BaseTestTask.STATE_NONE || task.isFinish())) {
             task.setFinish(false);
             task.setmExecuteState(BaseTestTask.STATE_NONE);
             FutureTask<Boolean> futureTask = new FutureTask(task);
@@ -56,10 +56,18 @@ public class ScreenController extends BaseController implements ScreenPresenter.
         mHandler.sendEmptyMessage(Constants.HandlerMsg.MSG_COMPLETE);
     }
 
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+    }
 
     static class ScreenHandler extends Handler {
 
-        private WeakReference<ScreenController> controllerWeakReference  ;
+        private WeakReference<ScreenController> controllerWeakReference;
 
         ScreenHandler(ScreenController controller) {
             controllerWeakReference = new WeakReference<>(controller);
@@ -72,7 +80,7 @@ public class ScreenController extends BaseController implements ScreenPresenter.
                 return;
             }
             ScreenController controller = controllerWeakReference.get();
-            if (controller == null) {
+            if (controller == null || controller.mView == null ) {
                 return;
             }
             switch (msg.what) {

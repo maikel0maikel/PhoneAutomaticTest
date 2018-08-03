@@ -42,6 +42,11 @@ public class VolumeAdjustFragment extends BaseFragment implements VolumePresente
     }
 
     @Override
+    public void destroy() {
+
+    }
+
+    @Override
     public void setPresenter(BasePresenter presenter) {
         mPresenter = (BaseExecutePresenter) presenter;
     }

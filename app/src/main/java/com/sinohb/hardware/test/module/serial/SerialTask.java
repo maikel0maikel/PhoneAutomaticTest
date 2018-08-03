@@ -31,16 +31,22 @@ public class SerialTask extends BaseAutoTestTask {
             synchronized (mSync) {
                 switch (mTestStep) {
                     case STEP_COMMAND_SEND:
-                        ((SerialPresenter.Controller) mPresenter).getVersion();
+                        ((SerialPresenter.Controller) mPresenter.get()).getVersion();
                         LogTools.p(TAG,"发送获取记录仪版本指令");
-                        mSync.wait();
+                        mSync.wait(10*1000);
+                        if (mTestStep == STEP_COMMAND_SEND){
+                            mExecuteState = STATE_TEST_UNPASS;
+                            LogTools.p(TAG,"发送获取记录仪版本指令超时不通过");
+                        }
                         break;
                     case STEP_COMMAND_SEND_OK:
-                        LogTools.p(TAG,"指令发送成功");
-                        mSync.wait();
+                        LogTools.p(TAG,"获取记录仪版本成功");
+                        stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
+                        mExecuteState = STATE_FINISH;
                         break;
                     case STEP_COMMAND_SEND_FAILURE:
-                        LogTools.p(TAG,"指令发送失败");
+                        LogTools.p(TAG,"获取记录仪版本失败【指令无法发送】");
+                        stepEntities.get(0).setTestState(Constants.TestItemState.STATE_FAIL);
                         mTestStep = STEP_COMMAND_SEND;
                         break;
                 }
@@ -48,14 +54,13 @@ public class SerialTask extends BaseAutoTestTask {
             }
         }
     }
-
-    public void notifyResult() {
-        synchronized (mSync) {
-            stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
-            mExecuteState = STATE_FINISH;
-            mSync.notify();
-        }
-    }
+//
+//    public void notifyResult() {
+//        synchronized (mSync) {
+//            mTestStep = STEP_COMMAND_SEND_OK;
+//            mSync.notify();
+//        }
+//    }
 
     @Override
     protected void startTest() {

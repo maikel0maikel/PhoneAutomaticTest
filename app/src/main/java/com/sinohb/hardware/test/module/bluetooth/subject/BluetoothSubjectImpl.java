@@ -57,4 +57,12 @@ public class BluetoothSubjectImpl implements IBluetoothSubject{
             observer.notifyScanFinished();
         }
     }
+
+    @Override
+    public void destroy() {
+        if (observers!=null){
+            observers.clear();
+            observers = null;
+        }
+    }
 }

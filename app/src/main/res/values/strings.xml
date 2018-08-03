@@ -31,7 +31,7 @@
 
     <string name="label_test_fail">Test failed, please check the details or re-test, test the item separately </string>
         
-    <string name="label_bt_test_success_hint">Bluetooth test passed, please manually test Bluetooth connection, pairing, Bluetooth phone to ensure normal function </string>
+    <string name="label_bt_test_success_hint">Bluetooth is connected, please manually test Bluetooth phone and media play </string>
 
         
     <string name="label_rgb_test_waite_hint">Please pay attention to the screen, and the screen will be tested later.</string>
@@ -51,32 +51,45 @@
     <string name="label_test_screen_brightness_wait_hint">The screen brightness test will be performed later, please observe the screen brightness change </string>
 
         
-    <string name="label_test_screen_bringhtness_l_hint">low brightness</string>
+    <string name="label_test_screen_bringhtness_l_hint">Low brightness</string>
         
-    <string name="label_test_screen_bringhtness_m_hint">中亮</string>
+    <string name="label_test_screen_bringhtness_m_hint">Medium brightness</string>
         
-    <string name="label_test_screen_bringhtness_h_hint">high brightness</string>
+    <string name="label_test_screen_bringhtness_h_hint">High brightness</string>
 
         
     <string name="label_test_radio_hint">The radio test will be done later, please note if the radio station changes when playing the radio </string>
         
     <string name="label_test_radio_open_hint">Testing the radio to turn on...</string>
         
-    <string name="label_test_radio_search_hint">Testing radio search...</string>
+    <string name="label_test_radio_search_down_hint">正在向下搜索电台，目标电台%1$.1f...</string>
+    <string name="label_test_radio_search_up_hint">正在向上搜索电台，目标电台%1$.1f...</string>
         
     <string name="label_test_radio_play_hint">Playing station %1$.1f</string>
         
     <string name="label_test_radio_close_hint"> testing the radio off...</string>
         
     <string name="label_test_radio_search_none_hint">No stations were found, please insert the signal transmitter and try again</string>
-
+    <string name="label_test_radio_search_down_stop">Search for the station down, stop %1$.1f</string>
+        
+    <string name="label_test_radio_search_up_stop">Upward search radio completion, stop %1$.1f</string>
         
     <string name="label_test_sound_effect_hint">The sound test will be done later, please note whether the sound changes.</string>
         
     <string name="label_test_sound_effect_play_none">No sound playback</string>
         
     <string name="label_test_sound_effect_play">with sound playback</string>
-
+    <string name="label_effect_none">no sound</string>
+        
+    <string name="label_effect_classical">classical </string>
+        
+    <string name="label_effect_jazz">jazz</string>
+        
+    <string name="label_effect_rock">rock </string>
+        
+    <string name="label_effect_folk">folk</string>
+        
+    <string name="label_effect_pop">pop </string>
         
     <string name="lable_left_front_btn">left front </string>
         
@@ -150,7 +163,9 @@
     <string name="label_bt_discovery">Scan Bluetooth</string>
         
     <string name="label_bt_stop_discovery">Stop scanning Bluetooth</string>
-        
+    <string name="label_bt_connect">Connect bluetooth(%1$s)</string>
+      
+    <string name="label_bt_connect_emtpy_config">Connect bluetooth(empty config mac)</string>  
     <string name="label_aux_plug">AUX insertion detection </string>
         
     <string name="label_gps_locate">GPS positioning</string>
@@ -174,10 +189,12 @@
         
     <string name="label_radio_open">radio on</string>
         
-    <string name="label_radio_search">Radio Search</string>
+    <string name="label_radio_search_down">Search for stations down</string>
+    <string name="label_radio_search_up">Search for stations up</string>
         
-    <string name="label_radio_play">radio play</string>
-        
+    <string name="label_radio_search_down_empty_config">Search for stations down(config stations empty)</string>
+    <string name="label_radio_search_up_empty_config">Search for stations up(config stations empty)</string>
+    <string name="label_radio_search_fail_hint">target%1$.1f, stop %2$.1f</string>
     <string name="label_radio_close">radio off</string>
         
     <string name="label_rgb_r">red </string>
@@ -214,10 +231,10 @@
         
     <string name="label_wifi_discovery">scanning hotspots</string>
         
-    <string name="label_wifi_connect">Connection hotspot</string>
+    <string name="label_wifi_connect">Connection hotspot(%1$s)</string>
         
     <string name="label_wifi_request">network request </string>
-
+    <string name="label_wifi_connect_empty_config">Connection hotspot(empty config wifi SSID)</string>
         
     <string name="label_fan_turn_on">Send open fan command </string>
         
@@ -240,7 +257,7 @@
         
     <string name="label_gps_stop_locate">End of positioning</string>
         
-    <string name="label_emperature">temperature detection </string>
+    <string name="label_temperature">temperature detection(temperature%1$d) </string>
 
         
     <string name="label_start_task">Start </string>

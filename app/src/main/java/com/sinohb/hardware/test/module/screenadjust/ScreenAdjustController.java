@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.DisplayMetrics;
 
-import com.sinohb.hardware.test.app.BaseExecuteView;
 import com.sinohb.hardware.test.app.BaseView;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.entities.Calibration;
@@ -34,9 +33,11 @@ public class ScreenAdjustController extends BaseController implements ScreenAdju
 
     @Override
     protected void init() {
-        DisplayMetrics metrics = ((Context) mView).getResources().getDisplayMetrics();
-        X_RES = metrics.widthPixels;
-        Y_RES = metrics.heightPixels;
+        if (mView != null ) {
+            DisplayMetrics metrics = ((Context) mView).getResources().getDisplayMetrics();
+            X_RES = metrics.widthPixels;
+            Y_RES = metrics.heightPixels;
+        }
         mHandler = new AdjustHandler(this);
         initScreenPoints();
         task = new ScreenAdjustTask(this);
@@ -116,17 +117,26 @@ public class ScreenAdjustController extends BaseController implements ScreenAdju
         if (Math.abs(cal.xfb[mJustDirection] - tmpx) > 25 ||
                 Math.abs(cal.yfb[mJustDirection] - tmpy) > 25) {
             ((ScreenAdjustTask) task).adjustFailure(mJustDirection);
-            ((ScreenAdjustPresenter.View) mView).adjustFailure(mJustDirection);
+            if (mView != null )
+                ((ScreenAdjustPresenter.View) mView).adjustFailure(mJustDirection);
             return true;
         }
         return false;
     }
 
     @Override
-    public BaseTestTask getTask() {
-        return task;
+    public void destroy() {
+        if (cal != null) {
+            cal.xfb = null;
+            cal.yfb = null;
+            cal = null;
+        }
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+        super.destroy();
     }
-
 
     @Override
     public void complete() {
@@ -237,7 +247,7 @@ public class ScreenAdjustController extends BaseController implements ScreenAdju
                 return;
             }
             ScreenAdjustController controller = controllerWeakReference.get();
-            if (controller == null) {
+            if (controller == null||controller.mView==null) {
                 LogTools.e(TAG, "controller is null");
                 return;
             }

@@ -5,19 +5,20 @@ import android.bluetooth.BluetoothDevice;
 import android.content.IntentFilter;
 
 import com.sinohb.hardware.test.HardwareTestApplication;
-import com.sinohb.hardware.test.app.BaseExecuteView;
-import com.sinohb.hardware.test.module.BaseExecuteController;
+import com.sinohb.hardware.test.app.BaseDisplayViewView;
+import com.sinohb.hardware.test.constant.Constants;
+import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.hardware.test.module.bluetooth.receiver.BluetoothEventReceiver;
 import com.sinohb.hardware.test.module.bluetooth.subject.BluetoothObserver;
 import com.sinohb.hardware.test.module.bluetooth.subject.BluetoothSubjectManager;
-import com.sinohb.hardware.test.task.BaseTestTask;
+import com.sinohb.logger.LogTools;
 
-public class BluetoothController extends BaseExecuteController implements BluetoothPresenter.Controller, BluetoothObserver {
+public class BluetoothController extends BaseDisplayViewController implements BluetoothPresenter.Controller, BluetoothObserver {
 
     private BluetoothEventReceiver bluetoothReceiver;
     private BluetoothManagerable mBluetoothManager;
 
-    public BluetoothController(BaseExecuteView view) {
+    public BluetoothController(BaseDisplayViewView view) {
         super(view);
         init();
     }
@@ -32,23 +33,23 @@ public class BluetoothController extends BaseExecuteController implements Blueto
 
     @Override
     public int openBt() {
-        return mBluetoothManager.open();
+        return mBluetoothManager == null ? Constants.DEVICE_NOT_SUPPORT : mBluetoothManager.open();
 
     }
 
     @Override
     public int closeBt() {
-        return mBluetoothManager.close();
+        return mBluetoothManager == null ? Constants.DEVICE_NOT_SUPPORT : mBluetoothManager.close();
     }
 
     @Override
     public int startDiscovery() {
-        return mBluetoothManager.startDiscovery();
+        return mBluetoothManager == null ? Constants.DEVICE_NOT_SUPPORT : mBluetoothManager.startDiscovery();
     }
 
     @Override
     public int stopDisvcovery() {
-        return mBluetoothManager.stopDiscovery();
+        return mBluetoothManager == null ? Constants.DEVICE_NOT_SUPPORT : mBluetoothManager.stopDiscovery();
     }
 
     @Override
@@ -57,8 +58,8 @@ public class BluetoothController extends BaseExecuteController implements Blueto
     }
 
     @Override
-    public void connect() {
-
+    public int connect(String mac) {
+        return mBluetoothManager == null ? Constants.DEVICE_NOT_SUPPORT : mBluetoothManager.connect(mac);
     }
 
     @Override
@@ -76,26 +77,33 @@ public class BluetoothController extends BaseExecuteController implements Blueto
 
     }
 
+    @Override
+    public void notifyConnected() {
+        if (mView!=null){
+            ((BaseDisplayViewView)mView).displayView();
+        }
+    }
 
     @Override
-    public void destroy() {
-        super.destroy();
-        unregistBluetoothReceiver();
-        BluetoothSubjectManager.getInstance().detachBluetoothObserver(this);
+    public void displayView() {
+
     }
 
     private void registBluetoothReceiver() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-        intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
-        intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
-        bluetoothReceiver = new BluetoothEventReceiver();
-        HardwareTestApplication.getContext().registerReceiver(bluetoothReceiver, intentFilter);
+        if (bluetoothReceiver == null) {
+            IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
+            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+            intentFilter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+            intentFilter.addAction(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+            intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+            intentFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+            intentFilter.addAction(BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED);
+            intentFilter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+            bluetoothReceiver = new BluetoothEventReceiver();
+            HardwareTestApplication.getContext().registerReceiver(bluetoothReceiver, intentFilter);
+        }
+
     }
 
     private void unregistBluetoothReceiver() {
@@ -107,7 +115,8 @@ public class BluetoothController extends BaseExecuteController implements Blueto
 
     @Override
     public void notifyOpenState(int openedState) {
-        ((BluetoothPresenter.View) mView).notifyOpenOrCloseState(openedState);
+        if (mView != null)
+            ((BluetoothPresenter.View) mView).notifyOpenOrCloseState(openedState);
         if (task != null) {
             ((BluetoothTestTask) task).notifyBtOpenState(openedState);
         }
@@ -120,12 +129,18 @@ public class BluetoothController extends BaseExecuteController implements Blueto
 
     @Override
     public void notifyConnectedState(int connectedState) {
-
+        LogTools.p(TAG, "notifyConnectedState connectedState=" + connectedState);
+        if (task != null) {
+            ((BluetoothTestTask) task).notifyConnectState(connectedState);
+        }
     }
 
     @Override
     public void notifyDeviceFound(String name, String address) {
-
+        LogTools.p(TAG,"notifyDeviceFound address:"+address);
+        if (task != null) {
+            ((BluetoothTestTask) task).notifyDeviceFound(address);
+        }
     }
 
     @Override
@@ -141,9 +156,17 @@ public class BluetoothController extends BaseExecuteController implements Blueto
             ((BluetoothTestTask) task).notifyBtStopDiscovery();
         }
     }
-//
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        unregistBluetoothReceiver();
+        BluetoothSubjectManager.getInstance().detachBluetoothObserver(this);
+        BluetoothSubjectManager.getInstance().destroy();
+    }
+
 //    @Override
 //    public BaseTestTask getTask() {
-//        return null;
+//        return task;
 //    }
 }

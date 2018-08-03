@@ -5,7 +5,7 @@ import com.sinohb.hardware.test.app.BaseExecutePresenter;
 import com.sinohb.hardware.test.app.BasePresenter;
 import com.sinohb.logger.LogTools;
 
-public class BaseAutoTestTask extends BaseTestTask{
+public class BaseAutoTestTask extends BaseTestTask {
 
     public BaseAutoTestTask(BasePresenter presenter) {
         super(presenter);
@@ -13,7 +13,12 @@ public class BaseAutoTestTask extends BaseTestTask{
 
     @Override
     public Integer call() throws Exception {
-        BaseExecutePresenter controller = (BaseExecutePresenter) mPresenter;
+        if (mPresenter == null || mPresenter.get() == null) {
+            mExecuteState = STATE_TEST_UNPASS;
+            LogTools.e(TAG, "mPresenter is null");
+            return 0;
+        }
+        BaseExecutePresenter controller = (BaseExecutePresenter) mPresenter.get();
         while (!isFinish) {
             switch (mExecuteState) {
                 case STATE_NONE:
@@ -39,7 +44,6 @@ public class BaseAutoTestTask extends BaseTestTask{
                     executeWaitState();
                     break;
                 case STATE_FINISH:
-                    //controller.complete();
                     descriptionSrc = R.string.label_auto_test_detail_success_hint;
                     isFinish = true;
                     isPass = 1;

@@ -11,4 +11,6 @@ public interface BluetoothManagerable {
     int stopDiscovery();
 
     int connect(String btAddress);
+
+    void destroy();
 }

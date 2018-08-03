@@ -34,14 +34,14 @@ public class RearViewTestTask extends BaseManualTestTask {
 
     @Override
     protected void executeRunningState() throws InterruptedException {
-        ((RearViewPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((RearViewPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
                 switch (mTestStep) {
                     case REAR_START_COMMAND_SEND:
-                        ((RearViewPresenter.Controller) mPresenter).notifyRearViewStart();
+                        ((RearViewPresenter.Controller) mPresenter.get()).notifyRearViewStart();
                         mPreStep = mTestStep;
-                        ((RearViewPresenter.Controller) mPresenter).startRearView();
+                        ((RearViewPresenter.Controller) mPresenter.get()).startRearView();
                         LogTools.p(TAG, "倒车后视启动");
                         rearStartCount++;
                         if (rearStartCount >= 3) {
@@ -57,9 +57,9 @@ public class RearViewTestTask extends BaseManualTestTask {
                         }
                         break;
                     case REAR_STOP:
-                        ((RearViewPresenter.Controller) mPresenter).notifyRearViewStop();
+                        ((RearViewPresenter.Controller) mPresenter.get()).notifyRearViewStop();
                         mPreStep = mTestStep;
-                        ((RearViewPresenter.Controller) mPresenter).stopRearView();
+                        ((RearViewPresenter.Controller) mPresenter.get()).stopRearView();
                         LogTools.p(TAG, "倒车后视停止");
                         rearStopCount++;
                         if (rearStopCount >= 3) {
@@ -85,6 +85,8 @@ public class RearViewTestTask extends BaseManualTestTask {
                         break;
                     case REAR_STOP_OK:
                         mExecuteState = STATE_TEST_WAIT_OPERATE;
+                        /**防止退不出多发一次**/
+                        ((RearViewPresenter.Controller) mPresenter.get()).stopRearView();
                         LogTools.p(TAG, "停止倒车后视成功");
                         break;
                 }
@@ -105,12 +107,18 @@ public class RearViewTestTask extends BaseManualTestTask {
         synchronized (mSync) {
             LogTools.p(TAG, "notifyRearResult mExecuteState=" + mExecuteState);
             if (mTestStep == REAR_START_COMMAND_SEND) {
-                if (mExecuteState == STATE_RUNNING){
+                if (mExecuteState == STATE_RUNNING) {
                     mTestStep = REAR_START_OK;
                 }
                 stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
                 mSync.notify();
-            } else if (mTestStep == REAR_STOP) {
+            }
+        }
+    }
+
+    public void notifyStop() {
+        synchronized (mSync) {
+            if (mTestStep == REAR_STOP) {
                 if (mExecuteState == STATE_RUNNING) {
                     mTestStep = REAR_STOP_OK;
                 }
@@ -122,7 +130,7 @@ public class RearViewTestTask extends BaseManualTestTask {
 
     public void sendFailure() {
         if (mExecuteState != STATE_RUNNING) {
-            LogTools.p(TAG, "mExecuteState:"+mExecuteState);
+            LogTools.p(TAG, "mExecuteState:" + mExecuteState);
             return;
         }
         synchronized (mSync) {
@@ -133,17 +141,17 @@ public class RearViewTestTask extends BaseManualTestTask {
 
     @Override
     protected void unpass() {
-        LogTools.p(TAG,"unpass mTestStep = "+mTestStep);
-        if (mTestStep!=REAR_STOP_OK&&mPresenter!=null){
-            ((RearViewPresenter.Controller) mPresenter).stopRearView();
+        LogTools.p(TAG, "unpass mTestStep = " + mTestStep);
+        if (mTestStep != REAR_STOP_OK && mPresenter.get() != null) {
+            ((RearViewPresenter.Controller) mPresenter.get()).stopRearView();
         }
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (mTestStep!=REAR_STOP_OK&&mPresenter!=null){
-            ((RearViewPresenter.Controller) mPresenter).stopRearView();
+        if (mTestStep != REAR_STOP_OK && mPresenter.get() != null) {
+            ((RearViewPresenter.Controller) mPresenter.get()).stopRearView();
         }
     }
 }

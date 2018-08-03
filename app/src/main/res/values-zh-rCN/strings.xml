@@ -29,7 +29,7 @@
     <string name="label_un_pass">不通过</string>
     <string name="label_test_finish">测试通过,您可以重新测试,单独测试该项</string>
     <string name="label_test_fail">测试不通过，请查看详情或重新测试，单独测试该项</string>
-    <string name="label_bt_test_success_hint">蓝牙测试通过，请手动测试蓝牙连接、配对、蓝牙电话确保功能正常</string>
+    <string name="label_bt_test_success_hint">蓝牙已经连接，请手动进一步测试蓝牙电话与媒体播放</string>
 
     <string name="label_rgb_test_waite_hint">请注意观察屏幕,稍后将进行屏幕坏点测试</string>
     
@@ -48,14 +48,23 @@
 
     <string name="label_test_radio_hint">稍后将进行收音机测试，请注意当播放电台时电台是否有更变</string>
     <string name="label_test_radio_open_hint">正在测试收音机打开...</string>
-    <string name="label_test_radio_search_hint">正在测试收音机搜索...</string>
+    <string name="label_test_radio_search_down_hint">正在向下搜索电台，目标电台%1$.1f...</string>
+    <string name="label_test_radio_search_up_hint">正在向上搜索电台，目标电台%1$.1f...</string>
     <string name="label_test_radio_play_hint">正在播放电台%1$.1f</string>
-    <string name="label_test_radio_close_hint">正在测试收音机关闭...</string>
+    <string name="label_test_radio_close_hint">正在关闭收音机...</string>
     <string name="label_test_radio_search_none_hint">没有搜索到任何电台，请插入信号发射器重试</string>
+    <string name="label_test_radio_search_down_stop">向下搜索电台完成，停台%1$.1f</string>
+    <string name="label_test_radio_search_up_stop">向上搜索电台完成，停台%1$.1f</string>
 
     <string name="label_test_sound_effect_hint">稍后将进行音效测试，请注意音效是否有变化</string>
     <string name="label_test_sound_effect_play_none">无音效播放</string>
     <string name="label_test_sound_effect_play">有音效播放</string>
+    <string name="label_effect_none">无音效</string>
+    <string name="label_effect_classical">古典</string>
+    <string name="label_effect_jazz">爵士</string>
+    <string name="label_effect_rock">摇滚</string>
+    <string name="label_effect_folk">民谣</string>
+    <string name="label_effect_pop">流行</string>
 
     <string name="lable_left_front_btn">左前</string>
     <string name="lable_left_rear_btn">左后</string>
@@ -100,6 +109,8 @@
     <string name="label_bt_reopen">重新打开蓝牙</string>
     <string name="label_bt_discovery">扫描蓝牙</string>
     <string name="label_bt_stop_discovery">停止扫描蓝牙</string>
+    <string name="label_bt_connect">连接蓝牙设备(%1$s)</string>
+    <string name="label_bt_connect_emtpy_config">连接蓝牙设备(未配置蓝牙Mac地址)</string>
     <string name="label_aux_plug">AUX插入检测</string>
 
     <string name="label_gps_locate">GPS定位</string>
@@ -113,8 +124,11 @@
 
     <string name="label_radio_reset">收音机重置</string>
     <string name="label_radio_open">收音机打开</string>
-    <string name="label_radio_search">收音机搜索</string>
-    <string name="label_radio_play">收音机播放</string>
+    <string name="label_radio_search_down">向下搜索电台</string>
+    <string name="label_radio_search_up">向上搜索电台</string>
+    <string name="label_radio_search_down_empty_config">向下搜索电台(未配置电台)</string>
+    <string name="label_radio_search_up_empty_config">向上搜索电台(未配置电台)</string>
+    <string name="label_radio_search_fail_hint">目标%1$.1f,停台%2$.1f</string>
     <string name="label_radio_close">收音机关闭</string>
     <string name="label_rgb_r">红色</string>
     <string name="label_rgb_g">绿色</string>
@@ -134,7 +148,8 @@
     <string name="label_wifi_close">关闭WIFI</string>
     <string name="label_wifi_reopen">重新打开WIFI</string>
     <string name="label_wifi_discovery">扫描热点</string>
-    <string name="label_wifi_connect">连接热点</string>
+    <string name="label_wifi_connect">连接热点(%1$s)</string>
+    <string name="label_wifi_connect_empty_config">连接热点(未配置热点)</string>
     <string name="label_wifi_request">网络请求</string>
 
     <string name="label_fan_turn_on">发送打开风扇指令</string>
@@ -148,8 +163,7 @@
 
     <string name="label_gps_start_locate">开始定位</string>
     <string name="label_gps_stop_locate">定位结束</string>
-    <string name="label_emperature">温度检测</string>
-
+    <string name="label_temperature">温度检测(温度阈值%1$d)</string>
     <string name="label_start_task">开始</string>
     <string name="label_stop_task">结束</string>
     <string name="label_ok_btn">确定</string>

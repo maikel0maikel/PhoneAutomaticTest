@@ -14,9 +14,9 @@ public interface EffectPresenter {
 
     interface Controller extends BaseDisplayViewPresenter{
 
-        int playNormal();
+       // int playNormal();
 
-        int playEffect();
+        int playEffect(int effect);
 
         int closeEffect();
 

@@ -41,7 +41,7 @@ public class KnobTestTask extends BaseManualTestTask {
             errorCount = 0;
             keyPressError++;
             try {
-                Thread.sleep(500);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -99,20 +99,20 @@ public class KnobTestTask extends BaseManualTestTask {
     @Override
     protected void executeRunningState() throws InterruptedException {
         super.executeRunningState();
-        ((KeyPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((KeyPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
                 switch (mTestStep) {
                     case SETP_PRESS_KNOB_COUNTERCLOCKWISE:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KNOB_COUNTERCLOCKWISE, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KNOB_COUNTERCLOCKWISE, errorCount);
                         LogTools.p(TAG, "旋钮测试逆时针");
                         if (breakCondition(SETP_PRESS_KNOB_CLOCKWISE)) break;
                         mSync.wait();
                         break;
                     case SETP_PRESS_KNOB_CLOCKWISE:
                         mPreStep = mTestStep;
-                        ((KeyPresenter.Controller) mPresenter).pressKey(Constants.HandlerMsg.MSG_KNOB_CLOCKWISE, errorCount);
+                        ((KeyPresenter.Controller) mPresenter.get()).pressKey(Constants.HandlerMsg.MSG_KNOB_CLOCKWISE, errorCount);
                         LogTools.p(TAG, "旋钮测试顺时针");
                         if (breakCondition(STEP_KNOB_FINISH)) break;
                         mSync.wait();

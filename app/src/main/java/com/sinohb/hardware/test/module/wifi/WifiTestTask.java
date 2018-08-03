@@ -1,7 +1,6 @@
 package com.sinohb.hardware.test.module.wifi;
 
 
-
 import android.os.Environment;
 
 import com.sinohb.hardware.test.HardwareTestApplication;
@@ -9,9 +8,11 @@ import com.sinohb.hardware.test.R;
 import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.constant.SerialConstants;
 import com.sinohb.hardware.test.constant.WifiConstants;
+import com.sinohb.hardware.test.entities.ConfigEntity;
 import com.sinohb.hardware.test.entities.StepEntity;
 import com.sinohb.hardware.test.task.BaseAutoTestTask;
 import com.sinohb.hardware.test.utils.FileUtils;
+import com.sinohb.hardware.test.utils.JsonUtils;
 import com.sinohb.logger.LogTools;
 
 import org.json.JSONException;
@@ -52,7 +53,7 @@ public class WifiTestTask extends BaseAutoTestTask {
     private static final int STEP_CONNECT_FAILURE = 13;
     private static final int SETP_OPEN_FAILURE = 14;
     private static final int STEP_RESET_FAILURE = 15;
-    private static final int  STEP_CLOSE_FAILURE = 16;
+    private static final int STEP_CLOSE_FAILURE = 16;
     private static final int STEP_REOPEN_FAILURE = 17;
     private static final int STEP_NET_REQUEST = 18;
     private int mTestStep = 0;
@@ -61,6 +62,9 @@ public class WifiTestTask extends BaseAutoTestTask {
 
     private static final int[] STEP_TITLES = {R.string.label_wifi_open, R.string.label_wifi_close,
             R.string.label_wifi_reopen, R.string.label_wifi_discovery, R.string.label_wifi_connect, R.string.label_wifi_request};
+    private String ssid = "";
+    private String pwd = "";
+
     public WifiTestTask(WifiPresenter.Controller presenter) {
         super(presenter);
         mTaskId = SerialConstants.ITEM_WIFI;
@@ -68,7 +72,7 @@ public class WifiTestTask extends BaseAutoTestTask {
 
     private void addStepEntity() {
         int i = 1;
-        for (int res:STEP_TITLES) {
+        for (int res : STEP_TITLES) {
             StepEntity stepEntity = new StepEntity(i, HardwareTestApplication.getContext().
                     getResources().getString(res), Constants.TestItemState.STATE_TESTING);
             stepEntities.add(stepEntity);
@@ -88,46 +92,45 @@ public class WifiTestTask extends BaseAutoTestTask {
 
     public void notifyOpenState(int state) {
         LogTools.p(TAG, "mTestStep:" + mTestStep);
+        if (state == WifiConstants.OpenOrCloseState.STATE_OPENING || state == WifiConstants.OpenOrCloseState.STATE_CLOSING) {
+            return;
+        }
         synchronized (mSync) {
             switch (state) {
                 case WifiConstants.OpenOrCloseState.STATE_OPENED:
                     if (mTestStep == STEP_OPEN) {
                         mTestStep = SETP_OPEN_FINISH;
-                        mSync.notify();
                     } else if (mTestStep == STEP_REOPEN) {
                         mTestStep = STEP_REOPEN_FINISH;
-                        mSync.notify();
-                    }else if (mTestStep == STEP_RESET){
+                    } else if (mTestStep == STEP_RESET) {
                         mTestStep = STEP_RESET_FAILURE;
-                        mSync.notify();
-                    }else if (mTestStep == STEP_CLOSE){
+                    } else if (mTestStep == STEP_CLOSE) {
                         mTestStep = STEP_CLOSE_FAILURE;
-                        mSync.notify();
                     }
                     break;
                 case WifiConstants.OpenOrCloseState.STATE_CLOSED:
                     if (mTestStep == STEP_CLOSE) {
                         mTestStep = STEP_CLOSE_FINISH;
-                        mSync.notify();
                     } else if (mTestStep == STEP_RESET) {
                         mTestStep = STEP_RESET_FINISHED;
-                        mSync.notify();
-                    }else if (mTestStep == STEP_OPEN){
+                    } else if (mTestStep == STEP_OPEN) {
                         mTestStep = SETP_OPEN_FAILURE;
-                        mSync.notify();
-                    } else if (mTestStep == STEP_REOPEN){
+                    } else if (mTestStep == STEP_REOPEN) {
                         mTestStep = STEP_REOPEN_FAILURE;
-                        mSync.notify();
                     }
                     break;
+                case WifiConstants.OpenOrCloseState.STATE_UNKONWN:
+                    mExecuteState = STATE_TEST_UNPASS;
+                    break;
             }
+            mSync.notify();
         }
     }
 
     public void notifyConnectState(int state) {
-        synchronized (mSync) {
-            if (mTestStep == STEP_CONNECT) {
-                LogTools.p(TAG,"notifyConnectState method call state:"+state);
+        if (mTestStep == STEP_CONNECT) {
+            synchronized (mSync) {
+                LogTools.p(TAG, "notifyConnectState method call state:" + state);
                 mTestStep = state == WifiConstants.ConnectState.STATE_CONNECTED ? STEP_CONNECT_OK : STEP_CONNECT_FAILURE;
                 mSync.notify();
             }
@@ -135,8 +138,8 @@ public class WifiTestTask extends BaseAutoTestTask {
     }
 
     public void notifyScanFinished() {
-        synchronized (mSync) {
-            if (mTestStep == STEP_DISCOVERY) {
+        if (mTestStep == STEP_DISCOVERY) {
+            synchronized (mSync) {
                 mTestStep = STEP_DISCOVERY_OK;
                 mSync.notify();
             }
@@ -201,8 +204,30 @@ public class WifiTestTask extends BaseAutoTestTask {
     @Override
     protected void startTest() {
         mTestStep = STEP_OPEN;
-        if (!stepEntities.isEmpty()){
+        if (!stepEntities.isEmpty()) {
             stepEntities.clear();
+        }
+
+        /**
+         * 读取配置文件中的热点
+         */
+        try {
+            String json = FileUtils.getFileContent(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Config.txt");
+            ConfigEntity configEntity = JsonUtils.parse(json, ConfigEntity.class);
+            if (configEntity != null && configEntity.wifi != null) {
+                ssid = configEntity.wifi.ssid;
+                pwd = configEntity.wifi.pwd;
+            }
+            LogTools.p(TAG, "ssid:" + ssid + ",pwd:" + pwd);
+        } catch (IOException e) {
+            LogTools.e(TAG, "读取wifi热点失败");
+        } catch (Exception e) {
+            LogTools.e(TAG, e, "读取wifi热点失败");
+        }
+        if (ssid == null || ssid.length() == 0) {
+            STEP_TITLES[4] = R.string.label_wifi_connect_empty_config;
+        }else {
+            STEP_TITLES[4] = R.string.label_wifi_connect;
         }
         addStepEntity();
     }
@@ -211,12 +236,12 @@ public class WifiTestTask extends BaseAutoTestTask {
     protected void executeRunningState() throws InterruptedException {
         int result;
         while (mExecuteState == STATE_RUNNING) {
-            LogTools.p(TAG,"mTestStep:"+mTestStep);
+            LogTools.p(TAG, "mTestStep:" + mTestStep);
             synchronized (mSync) {
                 switch (mTestStep) {
                     case STEP_OPEN:
                         LogTools.p(TAG, "Wifi测试打开");
-                        result = ((WifiPresenter.Controller) mPresenter).openWifi();
+                        result = ((WifiPresenter.Controller) mPresenter.get()).openWifi();
                         if (result == Constants.DEVICE_RESET) {
                             LogTools.p(TAG, "WiFi处于打开状态，关闭重置");
                             mTestStep = STEP_RESET;
@@ -229,7 +254,7 @@ public class WifiTestTask extends BaseAutoTestTask {
                         break;
                     case SETP_OPEN_FINISH:
                         stepSuccess(STEP_CLOSE, 1, 0);
-                        LogTools.p(TAG,"wifi打开成功");
+                        LogTools.p(TAG, "wifi打开成功");
                         break;
                     case SETP_OPEN_FAILURE:
                         mExecuteState = STATE_TEST_UNPASS;
@@ -240,13 +265,13 @@ public class WifiTestTask extends BaseAutoTestTask {
                             StepEntity stepEntity = new StepEntity(0,
                                     HardwareTestApplication.getContext().getResources().getString(R.string.label_wifi_reset),
                                     Constants.TestItemState.STATE_TESTING);
-                            stepEntities.add(0,stepEntity);
+                            stepEntities.add(0, stepEntity);
                         }
-                        result = ((WifiPresenter.Controller) mPresenter).closeWifi();
-                        if (result == Constants.DEVICE_NORMAL){
+                        result = ((WifiPresenter.Controller) mPresenter.get()).closeWifi();
+                        if (result == Constants.DEVICE_NORMAL) {
                             stepOk(STEP_OPEN, 0);
                             break;
-                        }else if (deviceNotSupport(result)){
+                        } else if (deviceNotSupport(result)) {
                             break;
                         }
                         stepWait(STEP_RESET, "WiFi重置失败，超时--");
@@ -261,8 +286,8 @@ public class WifiTestTask extends BaseAutoTestTask {
                         break;
                     case STEP_CLOSE:
                         LogTools.p(TAG, "Wifi测试关闭");
-                        result = ((WifiPresenter.Controller) mPresenter).closeWifi();
-                        if (deviceNotSupport(result)){
+                        result = ((WifiPresenter.Controller) mPresenter.get()).closeWifi();
+                        if (deviceNotSupport(result)) {
                             break;
                         }
                         //mExecuteState = STATE_FINISH;//步骤调整
@@ -278,8 +303,8 @@ public class WifiTestTask extends BaseAutoTestTask {
                         break;
                     case STEP_REOPEN:
                         LogTools.p(TAG, "重新打开Wifi");
-                        result = ((WifiPresenter.Controller) mPresenter).openWifi();
-                        if (deviceNotSupport(result)){
+                        result = ((WifiPresenter.Controller) mPresenter.get()).openWifi();
+                        if (deviceNotSupport(result)) {
                             break;
                         }
                         stepWait(STEP_REOPEN, "WiFi重新打开失败，超时--");
@@ -294,7 +319,7 @@ public class WifiTestTask extends BaseAutoTestTask {
                         break;
                     case STEP_DISCOVERY:
                         LogTools.p(TAG, "Wifi测试扫描");
-                        result = ((WifiPresenter.Controller) mPresenter).startScan();
+                        result = ((WifiPresenter.Controller) mPresenter.get()).startScan();
                         if (deviceNotSupport(result)) {
                             break;
                         }
@@ -305,6 +330,11 @@ public class WifiTestTask extends BaseAutoTestTask {
                         LogTools.p(TAG, "wifi扫描ok，测试结果【测试通过】");
                         break;
                     case STEP_CONNECT:
+                        if (ssid == null || ssid.length() == 0) {
+                            LogTools.p(TAG, "ssid is null");
+                            mTestStep = STEP_CONNECT_FAILURE;
+                            break;
+                        }
                         LogTools.p(TAG, "Wifi测试连接，先睡眠2s防止获取不到热点");
                         try {
                             Thread.sleep(2000);
@@ -312,35 +342,26 @@ public class WifiTestTask extends BaseAutoTestTask {
                             e.printStackTrace();
                         }
                         LogTools.p(TAG, "Wifi测试连接");
-                        String ssid = "";
-                        String pwd = "";
-                        /**
-                         * 读取配置文件中的热点
-                         */
-                        try {
-                            String json = FileUtils.getFileContent(Environment.getExternalStorageDirectory().getAbsolutePath()+"/wifiConfig.txt");
-                            JSONObject object = new JSONObject(json);
-                            ssid = object.getString("ssid");
-                            pwd = object.getString("pwd");
-                            LogTools.p(TAG,"ssid:"+ssid+",pwd:"+pwd);
-                        } catch (IOException e) {
-                            LogTools.e(TAG,"读取wifi热点失败");
-                        } catch (JSONException e) {
-                            LogTools.e(TAG,e,"读取wifi热点失败");
+                        StepEntity entity;
+                        if (stepEntities.size() > STEP_TITLES.length) {
+                            entity = stepEntities.get(5);
+                        } else {
+                            entity = stepEntities.get(4);
                         }
-                        result = ((WifiPresenter.Controller) mPresenter).connectWifi(ssid,pwd);
+                        entity.setStepTitle(String.format(entity.getStepTitle(),ssid));
+                        result = ((WifiPresenter.Controller) mPresenter.get()).connectWifi(ssid, pwd);
                         if (result == Constants.DEVICE_CONNECTED) {
                             LogTools.p(TAG, "Wifi已经连接");
                             mTestStep = STEP_CONNECT_OK;
                             break;
-                        } else if (deviceNotSupport(result)){
+                        } else if (deviceNotSupport(result)) {
                             break;
                         }
                         stepWait(STEP_CONNECT, "WiFi扫描失败，超时--");
                         break;
                     case STEP_CONNECT_OK:
                         stepSuccess(STEP_NET_REQUEST, 5, 4);
-                        LogTools.p(TAG,"wifi连接成功");
+                        LogTools.p(TAG, "wifi连接成功");
                         break;
                     case STEP_CONNECT_FAILURE:
                         mExecuteState = STATE_TEST_UNPASS;
@@ -355,13 +376,13 @@ public class WifiTestTask extends BaseAutoTestTask {
                             LogTools.e(TAG, e, "请求失败");
                         }
                         if (code == 200) {
-                            LogTools.p(TAG,"请求百度成功");
+                            LogTools.p(TAG, "请求百度成功");
                             mExecuteState = STATE_FINISH;
-                            stepEntities.get(stepEntities.size()-1).setTestState(Constants.TestItemState.STATE_SUCCESS);
-                        }else {
+                            stepEntities.get(stepEntities.size() - 1).setTestState(Constants.TestItemState.STATE_SUCCESS);
+                        } else {
                             mExecuteState = STATE_TEST_UNPASS;
                             LogTools.p(TAG, "请求百度失败，网络不可用，测试结果【测试不通过】");
-                            stepEntities.get(stepEntities.size()-1).setTestState(Constants.TestItemState.STATE_FAIL);
+                            stepEntities.get(stepEntities.size() - 1).setTestState(Constants.TestItemState.STATE_FAIL);
                         }
                         //mTestStep = STEP_CLOSE;//步骤调整
                         break;
@@ -392,7 +413,6 @@ public class WifiTestTask extends BaseAutoTestTask {
         mTestStep = step;
         stepEntities.get(i).setTestState(Constants.TestItemState.STATE_SUCCESS);
     }
-
 
 
 }

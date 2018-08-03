@@ -39,7 +39,7 @@ public class ScreenAdjustTask extends BaseTestTask {
 
     @Override
     public Integer call() throws Exception {
-        ScreenAdjustPresenter.Controller controller = (ScreenAdjustPresenter.Controller) mPresenter;
+        ScreenAdjustPresenter.Controller controller = (ScreenAdjustPresenter.Controller) mPresenter.get();
         LogTools.p(TAG, "屏幕校准开始");
         while (!isFinish) {
             switch (mExecuteState) {

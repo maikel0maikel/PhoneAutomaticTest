@@ -173,4 +173,15 @@ public class AmplifierFragment extends BaseManualFragment implements AmplifierPr
             hintTv.setText(resId);
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (mHandler!=null){
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_AMPLIFIER_TEST_ALL);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_AMPLIFIER_HIT_POS);
+            mHandler.removeCallbacksAndMessages(null);
+            mHandler = null;
+        }
+    }
 }

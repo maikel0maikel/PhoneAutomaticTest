@@ -5,16 +5,23 @@ import com.sinohb.hardware.test.app.BaseDisplayViewPresenter;
 import com.sinohb.hardware.test.app.BasePresenter;
 import com.sinohb.logger.LogTools;
 
-public class BaseManualTestTask extends BaseTestTask{
+public class BaseManualTestTask extends BaseTestTask {
     private static final long STEP_TIME = 500;
     private static final long HINT_TIME = 200;
+
     public BaseManualTestTask(BasePresenter presenter) {
         super(presenter);
     }
 
     @Override
     public Integer call() throws Exception {
-        BaseDisplayViewPresenter controller = (BaseDisplayViewPresenter) mPresenter;
+        if (mPresenter == null || mPresenter.get() == null) {
+            LogTools.e(TAG, "mPresenter is null");
+            mExecuteState = STATE_TEST_UNPASS;
+            isFinish = true;
+            return 0;
+        }
+        BaseDisplayViewPresenter controller = (BaseDisplayViewPresenter) mPresenter.get();
         while (!isFinish) {
             switch (mExecuteState) {
                 case STATE_NONE:
@@ -49,16 +56,16 @@ public class BaseManualTestTask extends BaseTestTask{
                     Thread.sleep(HINT_TIME);
                     break;
                 case STATE_TEST_WAIT_OPERATE:
-                    LogTools.p(TAG,"等待用户操作......");
+                    LogTools.p(TAG, "等待用户操作......");
                     Thread.sleep(HINT_TIME);
                     controller.notifyExecuteState(STATE_TEST_WAIT_OPERATE);
-                    synchronized (mSync){
+                    synchronized (mSync) {
                         mSync.wait();
                     }
                     break;
                 case STATE_TEST_UNPASS:
                     descriptionSrc = R.string.label_manual_test_detail_fail_hint;
-                    LogTools.p(TAG,"测试不通过--");
+                    LogTools.p(TAG, "测试不通过--");
                     isFinish = true;
                     isPass = 0;
                     controller.notifyExecuteState(STATE_TEST_UNPASS);
@@ -70,6 +77,7 @@ public class BaseManualTestTask extends BaseTestTask{
         controller.complete();
         return isPass;
     }
+
     protected void executeStateStepFinish() throws InterruptedException {
 
     }

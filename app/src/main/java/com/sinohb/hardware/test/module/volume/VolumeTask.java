@@ -17,7 +17,7 @@ public class VolumeTask extends BaseTestTask {
 
     @Override
     public Integer call() throws Exception {
-        VolumePresenter.Controller controller = (VolumePresenter.Controller) mPresenter;
+        VolumePresenter.Controller controller = (VolumePresenter.Controller) mPresenter.get();
         while (!isFinish) {
             switch (mExecuteState) {
                 case STATE_NONE:

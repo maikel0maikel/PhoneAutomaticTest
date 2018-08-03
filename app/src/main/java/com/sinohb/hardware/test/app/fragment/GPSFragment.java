@@ -109,4 +109,19 @@ public class GPSFragment extends BaseAutomaticFragment  implements GPSPresenter.
             }
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        if (mHandler!=null){
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_START_LOCATE);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_STOP_LOCATE);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_STATUS);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_START_LOCATE_NOTIFY);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_STOP_LOCATE_NOTIFY);
+            mHandler.removeMessages(Constants.HandlerMsg.MSG_GPS_LOCATE_RESULT);
+            mHandler.removeCallbacksAndMessages(null);
+        }
+        mHandler = null;
+    }
 }

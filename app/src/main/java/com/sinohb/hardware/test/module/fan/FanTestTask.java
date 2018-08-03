@@ -34,7 +34,7 @@ public class FanTestTask extends BaseManualTestTask {
     @Override
     protected void executeRunningState() throws InterruptedException {
         LogTools.p(TAG, "风扇测试任务进行中");
-        ((FanPresenter.Controller) mPresenter).notifyExecuteState(STATE_RUNNING);
+        ((FanPresenter.Controller) mPresenter.get()).notifyExecuteState(STATE_RUNNING);
         while (mExecuteState == STATE_RUNNING) {
             synchronized (mSync) {
                 switch (mTestStep) {
@@ -46,7 +46,7 @@ public class FanTestTask extends BaseManualTestTask {
                         hasTestTurnOn = true;
                         stepEntities.get(0).setTestState(Constants.TestItemState.STATE_SUCCESS);
                         if (hasTestTurnOff){
-                            ((FanPresenter.Controller) mPresenter).notifyTest();
+                            ((FanPresenter.Controller) mPresenter.get()).notifyTest();
                             mExecuteState = STATE_TEST_WAIT_OPERATE;
                         }else {
                             mTestStep = STEP_TURN_OFF;
@@ -61,7 +61,7 @@ public class FanTestTask extends BaseManualTestTask {
                         stepEntities.get(1).setTestState(Constants.TestItemState.STATE_SUCCESS);
                         hasTestTurnOff = true;
                         if (hasTestTurnOn){
-                            ((FanPresenter.Controller) mPresenter).notifyTest();
+                            ((FanPresenter.Controller) mPresenter.get()).notifyTest();
                             mExecuteState = STATE_TEST_WAIT_OPERATE;
                         }else {
                             mTestStep = STEP_TURN_ON;

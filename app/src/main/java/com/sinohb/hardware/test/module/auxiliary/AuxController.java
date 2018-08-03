@@ -7,6 +7,8 @@ import com.sinohb.hardware.test.constant.Constants;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
 import com.sinohb.logger.LogTools;
 
+import java.lang.ref.WeakReference;
+
 public class AuxController extends BaseDisplayViewController implements AuxPresenter.Controller {
     private VehicleManagerable auxManager;
     private AuxStateListener listener;
@@ -19,7 +21,7 @@ public class AuxController extends BaseDisplayViewController implements AuxPrese
     @Override
     protected void init() {
         auxManager = new VehicleTestManager();
-        listener = new AuxStateListener();
+        listener = new AuxStateListener(this);
         auxManager.addVehicleListener(listener);
         task = new AuxTestTask(this);
     }
@@ -41,6 +43,7 @@ public class AuxController extends BaseDisplayViewController implements AuxPrese
         super.destroy();
         if (auxManager != null&& listener != null) {
             auxManager.removeVehicleListener(listener);
+            listener = null;
         }
     }
 
@@ -49,15 +52,23 @@ public class AuxController extends BaseDisplayViewController implements AuxPrese
 
     }
 
-    class AuxStateListener extends VehicleListener {
+    static class AuxStateListener extends VehicleListener {
+        WeakReference<AuxController> weakReference;
+        AuxStateListener(AuxController controller){
+            weakReference = new WeakReference<>(controller);
+        }
         @Override
         public void onExtendDataInfoChanged(int id, int value) {
             super.onExtendDataInfoChanged(id, value);
+            if (weakReference==null||weakReference.get() == null){
+                LogTools.e(TAG,"onExtendDataInfoChanged weakReference is null ");
+                return;
+            }
             LogTools.p(TAG, "onExtendDataInfoChanged id=" + id + ",value=" + value);
-            if (task != null && id == 0) {
-                notifyAuxStatus(value);
+            if (id == 0) {
+                weakReference.get().notifyAuxStatus(value);
                 if (value == 1) {
-                    ((AuxTestTask) task).notifyAuxInsert();
+                    ((AuxTestTask) weakReference.get().task).notifyAuxInsert();
                 }
             }
         }

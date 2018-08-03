@@ -3,7 +3,6 @@ package com.sinohb.hardware.test.module.key;
 
 import com.sinohb.hardware.test.app.BaseDisplayViewView;
 import com.sinohb.hardware.test.module.BaseDisplayViewController;
-import com.sinohb.hardware.test.task.BaseTestTask;
 
 public class KeyController extends BaseDisplayViewController implements KeyPresenter.Controller {
 
